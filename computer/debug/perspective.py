@@ -20,11 +20,11 @@ STOP_CRIT = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 SEARCH_BOX = (20, 20)
 
 # camera resolution
-RES = (640, 360)
+RES = (320, 190)
 # warped output dimensions
-OUT_RES = (600, 500)
+OUT_RES = (300, 250)
 # warped output scale
-SCALE = 0.1
+SCALE = 0.2
 
 # mapping from sqare test strip to output
 HOR_CENT = OUT_RES[0]/2  # horizontal centreline
