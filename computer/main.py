@@ -6,6 +6,7 @@ import vision as vi
 import hardware as hi
 from threading import Thread, Lock
 from time import sleep
+from math import pi
 if USE_SERVER:
     import server
 
@@ -25,21 +26,29 @@ class Main(Thread):
     def run(self):
         """Main control loop.
         """
+        ON = 6
+        OFF = 5
 
         while True:
             if self.hardware.get_state() == hi.AUTO:
                 angle = self.vision.read_frame()
-                self.hardware.add_to_pwm_queue(hi.SERVO, angle*60)
+                if angle != 0:
+                    angle = angle - pi/2
+                self.hardware.add_to_pwm_queue(hi.SERVO, angle * 80)
+                self.hardware.add_to_pwm_queue(hi.THROT, ON)
                 print "frame processed {}".format(angle)
 
 if __name__ == "__main__":
     # make the main thread and start it
     main = Main()
-    main.start()
 
     if USE_SERVER:
         # make the frame streaming server. This gets main control flow.
+        main.start()
+
         server.register_vision(main.vision)
         server = server.WebServer(('0.0.0.0', 5000), server.CamHandler)
         server.serve_forever()
+    else:
+        main.run()
 
