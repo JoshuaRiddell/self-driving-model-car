@@ -20,9 +20,9 @@ STOP_CRIT = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 SEARCH_BOX = (20, 20)
 
 # camera resolution
-RES = (1280, 720)
+RES = (640, 360)
 # warped output dimensions
-OUT_RES = (1800, 1280)
+OUT_RES = (600, 500)
 # warped output scale
 SCALE = 0.1
 
@@ -30,6 +30,7 @@ SCALE = 0.1
 HOR_CENT = OUT_RES[0]/2  # horizontal centreline
 INC = OUT_RES[0]/4 * SCALE  # increment (how big the square will be)
 VER_CENT = OUT_RES[1] - INC*2  # vertical centreline
+
 MAP_TO = np.array((
     (HOR_CENT - INC, VER_CENT - INC),
     (HOR_CENT + INC, VER_CENT - INC),
@@ -70,6 +71,7 @@ def handle_mouse(event, x, y, flags, param):
 def main():
     global clicked
     global coordinate
+    global MAP_TO
 
     cam = setup_camera()
 
@@ -86,6 +88,15 @@ def main():
         fd = open(MATRIX_FILENAME, 'r')
 
         coords = eval(fd.readline())
+
+        while True:
+            usr_input = raw_input("Use the file's mapping (y/n)? ")
+            if usr_input == 'y' or usr_input == 'Y':
+                MAP_TO = eval(fd.readline())
+                MAP_TO = np.array(MAP_TO, np.float32)
+                break
+            elif usr_input == 'n' or usr_input == 'N':
+                break
 
         # build the perspecitve matrix based on coordinates
         M = cv2.getPerspectiveTransform(
