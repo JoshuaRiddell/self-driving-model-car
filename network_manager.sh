@@ -1,1 +1,1 @@
-nm-connection-editor
+sudo nm-connection-editor
