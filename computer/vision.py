@@ -126,6 +126,8 @@ class VisionInterface(object):
 
         warped = cv.warpPerspective(frame, self.M, self.res)
 
+        self.update_frame(2, warped)
+
         threshs = thr.get_binary(warped, bounds=self.bounds)
         threshs = thr.apply_morph(threshs)
 
