@@ -146,7 +146,7 @@ def generate_direction(position, matrices):
     mags = [sqrt(x[0]**2 + x[1]**2) for x in vectors]
 
     angles[0] = angles[0] + 2*pi/12
-    mags[1] = 0
+    angles[1] = angles[1] - 3*pi/12
 
     comb_mags = sum(mags)
     if comb_mags == 0:
