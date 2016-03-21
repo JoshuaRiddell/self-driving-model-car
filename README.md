@@ -1,2 +1,3 @@
-# uqrobotics-drc
-The UQ Robotics code repository for the QUT Droid Racing Challenge
+# UQ Robotics - QUT Droid Racing Challenge Entry
+
+Here lies the main repository for resources concerning our entry to the QUT DRC.
