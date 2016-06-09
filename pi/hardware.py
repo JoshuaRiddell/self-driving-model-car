@@ -5,10 +5,22 @@ PI = pig.pi()
 STEER_PIN = 15
 THROTTLE_PIN = 14
 
-GPIO_CLOCK = 10000
+
+class HardwareInterface(object):
+	def __init__(self):
+		self.pi = pig.pi()
+		self.pwm_inputs = [PwmReader(self.pi, THROTTLE_PIN),
+			PwmReader(self.pi, STEER_PIN)]
+
+	def read_pwm(self):
+		pwm_values = []
+		for pwm_input in self.pwm_inputs:
+			pwm_values.append(pwm_input.read_pwm())
+		return pwm_values
+
 
 class PwmReader(object):
-	def __init__(self, pi, pin, gpio_clock=GPIO_CLOCK):
+	def __init__(self, pi, pin):
 		self.pi = pi
 		self.pin = pin
 
