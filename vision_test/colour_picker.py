@@ -10,6 +10,8 @@ bounds = [np.array([0,0,0]), np.array([255,255,255])]
 
 def mouse_click(frame, flags, x, y):
     if flags == cv2.EVENT_FLAG_LBUTTON:
+        print(x)
+        print(y)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)[y][x]
         for i in range(3):
             space[i].append(hsv[i])
@@ -44,6 +46,8 @@ while(True):
             break
     else:
         break
+
+print(bounds)
 
 cap.release()
 cv2.destroyAllWindows()
