@@ -1,16 +1,16 @@
-import hardware_interface as hi
-import vision
+import hardware as hi
+import vision as vi
 
 class MainApp(object):
-	def __init__(self):
-		self.vision_interface = vision.VisionInterface()
+    def __init__(self):
+        self.vis_int = vi.VisionInterface()
 
-	def run(self):
-		self.vision_interface.save_current_frame("hello world.png")
+    def run(self):
+        self.vis_int = 
 
 def main():
-	app = MainApp()
-	app.run()
+    app = MainApp()
+    app.run()
 
 if __name__ == "__main__":
-	main()
+    main()
