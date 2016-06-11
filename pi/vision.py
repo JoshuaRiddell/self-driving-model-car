@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-from threading import Thread, Lock
+# from threading import Thread, Lock
 
 NUM_COLOURS = 2
 
@@ -18,35 +18,26 @@ for i in range(len(BOUNDS)):
     for j in range(len(BOUNDS[i])):
         BOUNDS[i][j] = np.array(BOUNDS[i][j])
 
-print BOUNDS
-
 KERNEL_SIZE = 5
 
-class VisionInterface(Thread):
+class VisionInterface(object):
     def __init__(self, camera_id=0):
-        super(VisionInterface, self).__init__()
+        # super(VisionInterface, self).__init__()
 
-        self.lock = Lock()
+        # self.lock = Lock()
         self.cam = cv.VideoCapture(camera_id)
 
-    def run(self):
-        while True:
-            # get the current frame
-            ret, frame = self.cam.read()
+    def read_frame(self):
+        # get the current frame
+        ret, frame = self.cam.read()
 
-            # do a blur and convert colour space
-            frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE))
-            frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+        # do a blur and convert colour space
+        frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE))
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-            # threshold images
-            thresh = []
-            for i in range(NUM_COLOURS):
-                thresh.append(cv.inRange(
-                    frame[CROP[i][0][1]:CROP[i][1][1], CROP[i][0][0]:CROP[i][1][0]],
-                    *BOUNDS[i]))
-
-            cv.imshow('frame', frame)
-            cv.imshow('thresh', thresh[0])
-
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
+        # threshold images
+        thresh = []
+        for i in range(NUM_COLOURS):
+            thresh.append(cv.inRange(
+                frame[CROP[i][0][1]:CROP[i][1][1], CROP[i][0][0]:CROP[i][1][0]],
+                *BOUNDS[i]))
