@@ -30,7 +30,7 @@
 
 // idle values for outputs
 #define SERVO_IDLE 1364
-#define THROT_IDLE 1556
+#define THROT_IDLE 1546
 
 // specific thresholds
 #define SHUTDOWN_THRESH 1100  // less than this for shutdown
@@ -164,8 +164,8 @@ void manual_control() {
   play_sound(SOUND_HIGH);
   uint8_t timer_counter = 0;
   while (true) {
-    output_pins[SERVO_ID].write(pwm_val[SERVO_ID]);
-    output_pins[THROT_ID].write(pwm_val[THROT_ID]);
+    output_pins[SERVO_ID].writeMicroseconds(pwm_val[SERVO_ID]);
+    output_pins[THROT_ID].writeMicroseconds(pwm_val[THROT_ID]);
     
     if (pwm_val[SERVO_ID] > STEERING_THRESH) {
       timer_counter += 1;
@@ -214,8 +214,8 @@ void play_sound(uint16_t frequency) {
 }
 
 void reset_outputs() {
-  output_pins[SERVO_ID].write(SERVO_IDLE);
-  output_pins[THROT_ID].write(THROT_IDLE);
+  output_pins[SERVO_ID].writeMicroseconds(SERVO_IDLE);
+  output_pins[THROT_ID].writeMicroseconds(THROT_IDLE);
 }
 
 
