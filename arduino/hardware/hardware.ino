@@ -5,7 +5,9 @@
 // servo:   1032  1364  1700
 // throt:   1020  1556  2056
 
-
+// serial paramters
+#define SERIAL_BAUD 115200
+#define BUFFER_SIZE 2
 
 // buzzer parameters
 #define BUZZER_PIN 8
@@ -33,7 +35,10 @@
 // specific thresholds
 #define SHUTDOWN_THRESH 1100  // less than this for shutdown
 #define STARTUP_THRESH 1930  // larger than this for startup
-#define ARM_CUTOFF 3000 // ms to wait until arm
+#define ARM_CUTOFF 3000 // ms to wait until ar
+#define STEERING_THRESH 1650 // larger than this to go into manual control mode
+#define MANUAL_DELAY 20
+#define MANUAL_CUTOFF 2000
 
 // array values for servo and throttle
 #define SERVO_ID 0
@@ -48,14 +53,19 @@ Servo output_pins[NUM_CHANNELS];
 volatile unsigned long prev_time[NUM_CHANNELS];
 volatile uint16_t pwm_val[NUM_CHANNELS];
 
+// define incoming bytes buffer
+byte incomingBuffer[BUFFER_SIZE];
+
 void wait_for_arm(void);
 void wait_for_start(void);
 void play_sound(uint16_t frequency);
 void emergency_shutdown(void);
+void reset_outputs(void);
+void manual_control(void);
 
 void setup() {
   // start serial
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD);
 
   // sonar pin modes
   pinMode(SONAR_TRIG, OUTPUT);
@@ -81,21 +91,31 @@ void setup() {
 
 void loop() {
   wait_for_arm();
-  wait_for_start();
+  
+  while (true) {
+    wait_for_start();
+  
+    while (true) {
+      if (pwm_val[THROT_ID] < SHUTDOWN_THRESH) {
+        emergency_shutdown();
+      }
+      
+      if (pwm_val[THROT_ID] > STARTUP_THRESH && pwm_val[SERVO_ID] > STEERING_THRESH) {
+        manual_control();
+        break;
+      }
 
-  while (1) {
-    if (pwm_val[THROT_ID] < SHUTDOWN_THRESH) {
-      emergency_shutdown();
+      if (Serial.available()) {
+        Serial.readBytes(incomingBuffer, BUFFER_SIZE);
+        output_pins[incomingBuffer[0]].write(incomingBuffer[1]);
+      }
     }
-    
-    
   }
 }
 
 void wait_for_arm() {  
   uint8_t timer_counter = 0;
   while (true) {
-    Serial.println(pwm_val[THROT_ID]);
     if (pwm_val[THROT_ID] > STARTUP_THRESH) {
       timer_counter += 1;
       if (timer_counter == 1) {
@@ -130,10 +150,35 @@ void wait_for_start() {
 
 void emergency_shutdown() {
   while (true) {
-    output_pins[SERVO_ID].write(SERVO_IDLE);
-    output_pins[THROT_ID].write(THROT_IDLE);
+    reset_outputs();
     play_sound(SOUND_LOW);
   }
+}
+
+void manual_control() {
+  reset_outputs();
+  while (pwm_val[THROT_ID] > STARTUP_THRESH || pwm_val[SERVO_ID] > STEERING_THRESH) {
+    ;
+  }
+  delay(500);
+  play_sound(SOUND_HIGH);
+  uint8_t timer_counter = 0;
+  while (true) {
+    output_pins[SERVO_ID].write(pwm_val[SERVO_ID]);
+    output_pins[THROT_ID].write(pwm_val[THROT_ID]);
+    
+    if (pwm_val[SERVO_ID] > STEERING_THRESH) {
+      timer_counter += 1;
+      if (timer_counter > MANUAL_CUTOFF / MANUAL_DELAY) {
+        play_sound(SOUND_HIGH);
+        break;
+      }
+    } else {
+      timer_counter = 0;
+    }
+    delay(MANUAL_DELAY);
+  }
+  reset_outputs();
 }
 
 void handle_servo_intr() {
@@ -168,7 +213,10 @@ void play_sound(uint16_t frequency) {
   }
 }
 
-
+void reset_outputs() {
+  output_pins[SERVO_ID].write(SERVO_IDLE);
+  output_pins[THROT_ID].write(THROT_IDLE);
+}
 
 
 
