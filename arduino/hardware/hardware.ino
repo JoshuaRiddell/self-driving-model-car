@@ -1,5 +1,7 @@
+#include <NewPing.h>
 #include <Servo.h>
 #include <avr/io.h>
+
 
 // pwm values
 //          min   mid   max
@@ -20,7 +22,7 @@
 // sonar pins
 #define SONAR_ECHO 6
 #define SONAR_TRIG 7
-#define SONAR_DELAY 70
+#define SONAR_DELAY 60
 #define SONAR_TRIGGER 70
 
 // reciever pins
@@ -49,9 +51,11 @@
 #define NUM_CHANNELS 2
 
 // define ultrasonic sensor storage
-volatile unsigned long sonar_start = 0;
-volatile unsigned long sonar_distance = 0;
 unsigned long last_sonar = 0;
+uint8_t last_send = 0;
+uint8_t last_reading = 0;
+uint8_t current_ping = 0;
+NewPing sonar(SONAR_TRIG, SONAR_ECHO, SONAR_TRIGGER);
 
 // define pin arrays
 static const uint8_t input_pins[] = { SERVO_RX, THROT_RX };
@@ -93,8 +97,6 @@ void setup() {
   // attach unique pin interrupts
   attachInterrupt(digitalPinToInterrupt(SERVO_RX), handle_servo_intr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(THROT_RX), handle_throt_intr, CHANGE);
-  PCICR |= (1<<PCIE2);
-  PCMSK2 |= (1<<PCINT22);
   
   // set piezo output
   pinMode(BUZZER_PIN, OUTPUT);
@@ -118,9 +120,23 @@ void loop() {
       }
       
       if (millis() - last_sonar > SONAR_DELAY) {
-          digitalWrite(SONAR_TRIG, HIGH);
-          delayMicroseconds(10);
-          digitalWrite(SONAR_TRIG, LOW);
+        last_sonar = millis();
+        current_ping = sonar.ping_cm();
+        if (current_ping && !last_send) {
+          // inside range
+          if (last_reading) {
+            Serial.print(1);
+            last_send = 1;
+          }
+          last_reading = 1;
+        } else if (!current_ping && last_send) {
+          // outside range
+          if (!last_reading) {
+            Serial.print(0);
+            last_send = 0;
+          }
+          last_reading = 0;
+        }
       }
 
       if (Serial.available()) {
@@ -237,16 +253,6 @@ void reset_outputs() {
   output_pins[THROT_ID].writeMicroseconds(THROT_IDLE);
 }
 
-ISR(PCINT2_vect) {
-  if (digitalRead(SONAR_ECHO)) {
-    sonar_start = micros();
-    return;
-  }
-  sonar_distance = (micros() - sonar_start) / 58;
-  if (sonar_distance < SONAR_TRIGGER) {
-    Serial.print(1);
-  }
-}
 
 
 
