@@ -65,4 +65,9 @@ class HardwareInterface(threading.Thread):
                 if flags[i] is not None:
                     write_pwm(i, val_queue[i])
 
+            print(self.ser.inWaiting)
+
+            if self.ser.inWaiting():
+                print self.ser.read()
+
             sleep(0.02)
