@@ -1,68 +1,68 @@
-import pigpio as pig
-
-PI = pig.pi()
-
-INPUT_PINS = [20, 21]
-OUPTUT_PINS = [14, 15]
+from time import sleep
+import serial
+import threading
 
 # left, middle, right
-STEERING = [1045, 1380, 1715]
-
+SERVO_POINTS = [47, 79, 112]
 # full, idle, rev
-THROTTLE = [2055, 1555, 1020]
+THROT_POINTS = [146, 98, 47]
 
-PIN_BOUNDS = [
-    [1045, 1715],
-    [1555, 1555],
+OUTPUT_FACTORS = [
+    [x[1] for x in [SERVO_POINTS, THROT_POINTS]],  # centres
+    [(x[1]-x[0])/float(100) for x in [SERVO_POINTS, THROT_POINTS]],  # negative scaling
+    [(x[2]-x[1])/float(100) for x in [SERVO_POINTS, THROT_POINTS]],  # positive scaling
 ]
 
-class HardwareInterface(object):
-    def __init__(self, pwm_read=False):
-        self.pi = pig.pi()
-        # reading from pwm can be disabled to increase performance
-        if pwm_read:
-            self.pwm_inputs = [PwmReader(self.pi, x) for x in INPUT_PINS]
-        self.pwm_outputs = [PwmWriter(self.pi, x) for x in OUPTUT_PINS]
+PIN_BOUNDS = [
+    [47, 112],
+    [47, 146],
+]
 
-    def read_pwm(self):
-        pwm_values = []
-        for pwm_input in self.pwm_inputs:
-            pwm_values.append(pwm_input.read_pwm())
-        return pwm_values
+NUM_CHANNELS = 2
+
+DEVICE_PORT = "/dev/ttyACM0"
+DEVICE_BAUD = 115200
+
+
+class HardwareInterface(threading.Thread):
+    def __init__(self):
+        super(HardwareInterface, self).__init__()
+        self.lock = threading.Lock()
+        self.daemon = True
+
+        self.connect_serial()
+
+        self.flags = [None, None]
+        self.val_queue = [0, 0]
+
+        self.start()
+
+    def connect_serial(self):
+        self.ser = serial.Serial(DEVICE_PORT, DEVICE_BAUD, timeout=0.5)
 
     def write_pwm(self, perp_id, val):
-        if val > PIN_BOUNDS[perp_id][0] and val < PIN_BOUNDS[perp_id][1]:
-            self.pwm_outputs[perp_id].set_pwm(val)
-
-
-class PwmReader(object):
-    def __init__(self, pi, pin):
-        self.pi = pi
-        self.pin = pin
-
-        pi.set_mode(self.pin, pig.INPUT)  # set pin to input
-        pi.callback(self.pin, pig.EITHER_EDGE, self.edge)  # add callback for when logic level is changed
-
-        # initialise start and end variables
-        self.on_start_temp = 0
-        self.on_start = 0
-        self.on_end = 0
-    
-    def read_pwm(self):
-        return self.on_end - self.on_start
-
-    def edge(self, gpio_pin, new_edge, tick):
-        if new_edge == 1:
-            self.on_start_temp = tick
+        if val < 0:
+            # val is negative
+            val = OUTPUT_FACTORS[0][perp_id] + OUTPUT_FACTORS[1][perp_id] * val
         else:
-            self.on_end = tick
-            self.on_start = self.on_start_temp
+            # val is positive
+            val = OUTPUT_FACTORS[0][perp_id] + OUTPUT_FACTORS[2][perp_id] * val
 
-class PwmWriter(object):
-    def __init__(self, pi, pin):
-        self.pi = pi
-        self.pin = pin
+        # val is now a servo value, check bounds
+        if val > PIN_BOUNDS[perp_id][0] and val < PIN_BOUNDS[perp_id][1]:
+            self.ser.write(chr(int(perp_id)))
+            self.ser.write(chr(int(val)))
 
-        pi.set_mode(self.pin, pig.OUTPUT)  # set pin to input
+    def run(self):
+        while True:
+            self.lock.acquire()
+            flags = self.flags
+            val_queue = self.val_queue
+            self.flags = [None, None]
+            self.lock.release()
 
-        self.set_pwm = lambda x: pi.set_servo_pulsewidth(pin, x)
+            for i in range(NUM_CHANNELS):
+                if flags[i] is not None:
+                    write_pwm(i, val_queue[i])
+
+            sleep(0.02)
