@@ -2,15 +2,19 @@ import cv2 as cv
 import numpy as np
 # from threading import Thread, Lock
 
+# turn
+# right, straight, left
+# 120,   200,      230
+
 NUM_COLOURS = 2
 
 BOUNDS = [
-    [[19, 28, 117], [26, 255, 209]], # yellow
+    [[ 26,  28, 178], [ 30, 238, 230]], # yellow
     [[0,0,0], [255,255,255]], # blue
 ]
 
 CROP = [
-    [[466, 135], [633, 377]],  # yellow crop
+    [[466, 150], [633, 377]],  # yellow crop
     [[0, 0], [100, 100]], # blue crop
 ]
 
@@ -22,9 +26,6 @@ KERNEL_SIZE = 5
 
 class VisionInterface(object):
     def __init__(self, camera_id=0):
-        # super(VisionInterface, self).__init__()
-
-        # self.lock = Lock()
         self.cam = cv.VideoCapture(camera_id)
 
     def read_frame(self):
@@ -36,8 +37,36 @@ class VisionInterface(object):
         frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         # threshold images
-        thresh = []
-        for i in range(NUM_COLOURS):
-            thresh.append(cv.inRange(
-                frame[CROP[i][0][1]:CROP[i][1][1], CROP[i][0][0]:CROP[i][1][0]],
-                *BOUNDS[i]))
+        thresh = cv.inRange(
+            frame[CROP[0][0][1]:CROP[0][1][1], CROP[0][0][0]:CROP[0][1][0]],
+            *BOUNDS[0])
+
+        contours, heirarchy = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        
+        rows, cols = thresh.shape[:2]
+
+        if len(contours) == 0:
+            return None
+
+        line_params = cv.fitLine(contours[0], cv.cv.CV_DIST_L2, 0, 0.01, 0.01)
+        vx, vy, x, y = [x[0] for x in line_params]
+
+        righty = int(((cols-x)*vy/vx)+y)
+
+        if (righty > 225):
+            print "turn left"
+            return -60
+        elif (righty < 180):
+            print "turn right"
+            return 60
+        else:
+            print "turn straight"
+            return 0
+
+        # line_frame = cv.line(thresh,(cols-1,righty),(0,lefty),(0,255,0),2)
+
+
+        # cv.imshow('frame', frame)
+        # cv.imshow('thresh', thresh)
+        # # cv.imshow('line', line_frame[0])
+        # cv.waitKey(0)

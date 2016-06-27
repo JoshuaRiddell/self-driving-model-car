@@ -5,7 +5,7 @@ import threading
 # left, middle, right
 SERVO_POINTS = [47, 79, 112]
 # full, idle, rev
-THROT_POINTS = [146, 98, 47]
+THROT_POINTS = [47, 98, 146]
 
 OUTPUT_FACTORS = [
     [x[1] for x in [SERVO_POINTS, THROT_POINTS]],  # centres
@@ -44,6 +44,8 @@ class HardwareInterface(threading.Thread):
         if val < 0:
             # val is negative
             val = OUTPUT_FACTORS[0][perp_id] + OUTPUT_FACTORS[1][perp_id] * val
+        elif val == 0:
+            val = OUTPUT_FACTORS[0][perp_id]
         else:
             # val is positive
             val = OUTPUT_FACTORS[0][perp_id] + OUTPUT_FACTORS[2][perp_id] * val
@@ -52,6 +54,7 @@ class HardwareInterface(threading.Thread):
         if val > PIN_BOUNDS[perp_id][0] and val < PIN_BOUNDS[perp_id][1]:
             self.ser.write(chr(int(perp_id)))
             self.ser.write(chr(int(val)))
+
 
     def run(self):
         while True:
@@ -65,9 +68,8 @@ class HardwareInterface(threading.Thread):
                 if flags[i] is not None:
                     write_pwm(i, val_queue[i])
 
-            print(self.ser.inWaiting)
-
             if self.ser.inWaiting():
-                print self.ser.read()
+                # print self.ser.read()
+                pass
 
             sleep(0.02)

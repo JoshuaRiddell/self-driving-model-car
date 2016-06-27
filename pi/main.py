@@ -11,16 +11,30 @@ class MainApp(object):
         self.har_int = hi.HardwareInterface()
 
     def run(self):
-        self.har_int.write_pwm(THROT, 0)
-        self.har_int.write_pwm(SERVO, 0)
+        # sleep(5)
+        # self.har_int.write_pwm(THROT, 0)
+        # sleep(2)
+
+        # for i in range(6):
+        #     print i
+        #     self.har_int.write_pwm(THROT, i)
+        #     sleep(0.1)
 
         while True:
-            sleep(1)
-            self.har_int.write_pwm(SERVO, -50)
-            sleep(1)
-            self.har_int.write_pwm(SERVO, 0)
-            sleep(1)
-            self.har_int.write_pwm(SERVO, 50)
+            steer = self.vis_int.read_frame()
+
+            if steer is None:
+                continue
+
+            self.har_int.write_pwm(SERVO, steer)
+
+        # while True:
+        #     sleep(1)
+        #     self.har_int.write_pwm(SERVO, -50)
+        #     sleep(1)
+        #     self.har_int.write_pwm(SERVO, 0)
+        #     sleep(1)
+        #     self.har_int.write_pwm(SERVO, 50)
 
 
 def main():

@@ -23,7 +23,9 @@ def mouse_click(frame, flags, x, y):
 
 
 cv2.namedWindow('frame')
+cv2.namedWindow('thresh')
 cv2.setMouseCallback('frame', lambda event, x, y, flags, param: mouse_click(frame, flags, x, y))
+cv2.setMouseCallback('thresh', lambda event, x, y, flags, param: mouse_click(frame, flags, x, y))
 
 cap = cv2.VideoCapture(1)
 
@@ -47,7 +49,7 @@ while(True):
     else:
         break
 
-print(bounds)
+print([bounds[0], bounds[1]])
 
 cap.release()
 cv2.destroyAllWindows()
