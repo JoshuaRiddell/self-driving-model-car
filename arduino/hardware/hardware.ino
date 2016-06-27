@@ -1,4 +1,5 @@
 #include <Servo.h>
+#include <avr/io.h>
 
 // pwm values
 //          min   mid   max
@@ -17,8 +18,10 @@
 #define SOUND_LOW 115
 
 // sonar pins
-#define SONAR_ECHO 0
+#define SONAR_ECHO 6
 #define SONAR_TRIG 7
+#define SONAR_DELAY 70
+#define SONAR_TRIGGER 70
 
 // reciever pins
 #define SERVO_RX 2
@@ -45,6 +48,11 @@
 #define THROT_ID 1
 #define NUM_CHANNELS 2
 
+// define ultrasonic sensor storage
+volatile unsigned long sonar_start = 0;
+volatile unsigned long sonar_distance = 0;
+unsigned long last_sonar = 0;
+
 // define pin arrays
 static const uint8_t input_pins[] = { SERVO_RX, THROT_RX };
 Servo output_pins[NUM_CHANNELS];
@@ -69,6 +77,7 @@ void setup() {
 
   // sonar pin modes
   pinMode(SONAR_TRIG, OUTPUT);
+  pinMode(SONAR_ECHO, INPUT);
 
   // reciever pin modes
   pinMode(SERVO_RX, INPUT);
@@ -84,6 +93,8 @@ void setup() {
   // attach unique pin interrupts
   attachInterrupt(digitalPinToInterrupt(SERVO_RX), handle_servo_intr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(THROT_RX), handle_throt_intr, CHANGE);
+  PCICR |= (1<<PCIE2);
+  PCMSK2 |= (1<<PCINT22);
   
   // set piezo output
   pinMode(BUZZER_PIN, OUTPUT);
@@ -98,11 +109,18 @@ void loop() {
     while (true) {
       if (pwm_val[THROT_ID] < SHUTDOWN_THRESH) {
         emergency_shutdown();
+        break;
       }
       
       if (pwm_val[THROT_ID] > STARTUP_THRESH && pwm_val[SERVO_ID] > STEERING_THRESH) {
         manual_control();
         break;
+      }
+      
+      if (millis() - last_sonar > SONAR_DELAY) {
+          digitalWrite(SONAR_TRIG, HIGH);
+          delayMicroseconds(10);
+          digitalWrite(SONAR_TRIG, LOW);
       }
 
       if (Serial.available()) {
@@ -115,6 +133,7 @@ void loop() {
 
 void wait_for_arm() {  
   uint8_t timer_counter = 0;
+  
   while (true) {
     if (pwm_val[THROT_ID] > STARTUP_THRESH) {
       timer_counter += 1;
@@ -217,6 +236,26 @@ void reset_outputs() {
   output_pins[SERVO_ID].writeMicroseconds(SERVO_IDLE);
   output_pins[THROT_ID].writeMicroseconds(THROT_IDLE);
 }
+
+ISR(PCINT2_vect) {
+  if (digitalRead(SONAR_ECHO)) {
+    sonar_start = micros();
+    return;
+  }
+  sonar_distance = (micros() - sonar_start) / 58;
+  if (sonar_distance < SONAR_TRIGGER) {
+    Serial.print(1);
+  }
+}
+
+
+
+
+
+
+
+
+
 
 
 
