@@ -52,16 +52,9 @@ class VisionInterface(object):
         vx, vy, x, y = [x[0] for x in line_params]
 
         righty = int(((cols-x)*vy/vx)+y)
-
-        if (righty > 225):
-            print "turn left"
-            return -60
-        elif (righty < 180):
-            print "turn right"
-            return 60
-        else:
-            print "turn straight"
-            return 0
+        angle = int(round((rightY-202)/35*100)
+        print(angle)
+        return angle
 
         # line_frame = cv.line(thresh,(cols-1,righty),(0,lefty),(0,255,0),2)
 
