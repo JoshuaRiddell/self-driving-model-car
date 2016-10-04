@@ -69,7 +69,8 @@ class HardwareInterface(threading.Thread):
                     write_pwm(i, val_queue[i])
 
             if self.ser.inWaiting():
-                # print self.ser.read()
+                self.ser.read()
                 pass
+                # print self.ser.read()
 
             sleep(0.02)
