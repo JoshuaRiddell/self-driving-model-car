@@ -6,17 +6,15 @@ import numpy as np
 # right, straight, left
 # 120,   200,      230
 
-# [[16, 51,  8], [ 26, 255, 232]], # yellow
-
 NUM_COLOURS = 2
 
 BOUNDS = [
-    [[16, 51,  8], [ 26, 255, 232]], # yellow
+    [[ 26,  28, 178], [ 30, 238, 230]], # yellow
     [[0,0,0], [255,255,255]], # blue
 ]
 
 CROP = [
-    [[300, 130], [640, 390]],  # yellow crop
+    [[466, 150], [633, 377]],  # yellow crop
     [[0, 0], [100, 100]], # blue crop
 ]
 
@@ -44,7 +42,7 @@ class VisionInterface(object):
             *BOUNDS[0])
 
         contours, heirarchy = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        
+
         rows, cols = thresh.shape[:2]
 
         if len(contours) == 0:
@@ -54,16 +52,14 @@ class VisionInterface(object):
         vx, vy, x, y = [x[0] for x in line_params]
 
         righty = int(((cols-x)*vy/vx)+y)
-
-        righty = (200-righty)*0.45
-
-        if righty > 100:
-            righty = 100
-        elif righty < -100:
-            righty = -100
-        
-        print righty
-
-        return righty
+        angle = int(round((rightY-202)/35*100)
+        print(angle)
+        return angle
 
         # line_frame = cv.line(thresh,(cols-1,righty),(0,lefty),(0,255,0),2)
+
+
+        # cv.imshow('frame', frame)
+        # cv.imshow('thresh', thresh)
+        # # cv.imshow('line', line_frame[0])
+        # cv.waitKey(0)
