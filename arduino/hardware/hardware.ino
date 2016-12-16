@@ -1,8 +1,9 @@
 #include <NewPing.h>
 #include <Servo.h>
-#include <avr/io.h>
 
 #include "config.h"
+#include "ranging.h"
+#include "state_lights.h"
 
 // add proper tones
 // add status LEDs
@@ -10,14 +11,8 @@
 // debug switch
 #define DEBUG  // enables debug messages
 #define SERIAL  // enables serial communications (in deployment this will be enabled)
+// #define SONAR  // enables sonar ranging in the serial output
 #define PIEZO_OFF  // turns the piezo off for quiet debugging mode
-
-// define ultrasonic sensor storage
-unsigned long last_sonar = 0;
-uint8_t last_send = 0;
-uint8_t last_reading = 0;
-uint8_t current_ping = 0;
-NewPing sonar(SONAR_TRIG, SONAR_ECHO, SONAR_TRIGGER);
 
 // define pin arrays
 static const uint8_t input_pins[] = { SERVO_RX, THROT_RX };
@@ -33,19 +28,22 @@ byte incomingBuffer[BUFFER_SIZE];
 void wait_for_arm(void);
 void wait_for_start(void);
 void play_sound(uint16_t frequency);
-void emergency_shutdown(void);
 void reset_outputs(void);
 void manual_control(void);
 
 void setup() {
+  setup_lights();
+
   // start serial
 #ifdef DEBUG
   Serial.begin(SERIAL_BAUD);
 #endif  
 
+#ifdef SONAR
   // sonar pin modes
   pinMode(SONAR_TRIG, OUTPUT);
   pinMode(SONAR_ECHO, INPUT);
+#endif
 
   // reciever pin modes
   pinMode(SERVO_RX, INPUT);
@@ -71,37 +69,23 @@ void loop() {
   
   while (true) {
     wait_for_start();
-  
+
+#ifdef SONAR
+    unsigned long last_sonar = 0;  // the time that the sonar was last read
+#endif
+
     while (true) {
       if (pwm_val[THROT_ID] < SHUTDOWN_THRESH) {
-        emergency_shutdown();
-        break;
-      }
-      
-      if (pwm_val[THROT_ID] > STARTUP_THRESH && pwm_val[SERVO_ID] > STEERING_THRESH) {
         manual_control();
         break;
       }
-      
+
+#ifdef SONAR
       if (millis() - last_sonar > SONAR_DELAY) {
         last_sonar = millis();
-        current_ping = sonar.ping_cm();
-        if (current_ping && !last_send) {
-          // inside range
-          if (last_reading) {
-            Serial.print(1);
-            last_send = 1;
-          }
-          last_reading = 1;
-        } else if (!current_ping && last_send) {
-          // outside range
-          if (!last_reading) {
-            Serial.print(0);
-            last_send = 0;
-          }
-          last_reading = 0;
-        }
+        
       }
+#endif
 
       if (Serial.available()) {
         Serial.readBytes(incomingBuffer, BUFFER_SIZE);
@@ -113,31 +97,36 @@ void loop() {
 
 void wait_for_arm() {  
   uint8_t timer_counter = 0;
-  
   while (true) {
     if (pwm_val[THROT_ID] > STARTUP_THRESH) {
       timer_counter += 1;
       if (timer_counter == 1) {
+        set_light(BLUE);
         play_sound(SOUND_LOW);
       } else if (timer_counter > ARM_CUTOFF / 50) {
         break;
       }
     } else {
+      clear_light(BLUE);
       timer_counter = 0;
     }
     delay(50);
   }
-  
+
+  set_light(RED);
   play_sound(SOUND_HIGH);
-  delay(50);
+  delay(100);
   play_sound(SOUND_HIGH);
-  
+   
   while (pwm_val[THROT_ID] > STARTUP_THRESH) {
     ;
   }
   
   play_sound(SOUND_LOW);
-  delay(500);
+  set_light(GREEN);
+  clear_light(BLUE);
+  clear_light(RED);
+  delay(100);
 }
 
 void wait_for_start() {
@@ -145,13 +134,7 @@ void wait_for_start() {
     ;
   }
   play_sound(SOUND_HIGH);
-}
-
-void emergency_shutdown() {
-  while (true) {
-    reset_outputs();
-    play_sound(SOUND_LOW);
-  }
+  clear_light(WHITE);
 }
 
 void manual_control() {

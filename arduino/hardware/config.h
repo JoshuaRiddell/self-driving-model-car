@@ -14,12 +14,6 @@
 #define SOUND_MIDDLE 110
 #define SOUND_LOW 115
 
-// sonar pins
-#define SONAR_ECHO 6
-#define SONAR_TRIG 7
-#define SONAR_DELAY 60
-#define SONAR_TRIGGER 70
-
 // reciever pins
 #define SERVO_RX 2
 #define THROT_RX 3
@@ -35,7 +29,7 @@
 // specific thresholds
 #define SHUTDOWN_THRESH 1100  // less than this for shutdown
 #define STARTUP_THRESH 1930  // larger than this for startup
-#define ARM_CUTOFF 3000 // ms to wait until ar
+#define ARM_CUTOFF 800 // ms to wait until arm
 #define STEERING_THRESH 1650 // larger than this to go into manual control mode
 #define MANUAL_DELAY 20
 #define MANUAL_CUTOFF 2000
