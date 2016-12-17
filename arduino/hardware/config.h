@@ -15,7 +15,7 @@
 
 // buzzer parameters
 #define BUZZER_PIN 8
-#define BUZZ_DURATION 40000
+#define BUZZ_DURATION 10000
 #define SOUND_HIGH 100
 #define SOUND_MIDDLE 110
 #define SOUND_LOW 115
@@ -32,6 +32,7 @@
 // idle values for outputs
 #define SERVO_IDLE 1364
 #define THROT_IDLE 1546
+#define IDLE_ERROR 10
 
 // specific thresholds
 #define SHUTDOWN_THRESH 1100  // less than this for shutdown

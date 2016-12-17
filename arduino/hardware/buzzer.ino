@@ -1,7 +1,5 @@
 #include "buzzer.h"
 
-
-
 void setup_buzzer() {
   pinMode(BUZZER_PIN, OUTPUT);
 }
