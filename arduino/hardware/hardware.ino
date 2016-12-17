@@ -11,12 +11,6 @@
 // add status LEDs
 // arg checking on serial input
 
-// debug switch
-#define DEBUG  // enables debug messages
-#define SERIAL  // enables serial communications (in deployment this will be enabled)
-// #define SONAR  // enables sonar ranging
-// #define PIEZO_OFF  // turns the piezo off for quiet debugging mode
-
 // define pin arrays
 Servo output_pins[NUM_CHANNELS];
 
@@ -25,13 +19,17 @@ byte incomingBuffer[BUFFER_SIZE];
 
 void wait_for_arm(void);
 void wait_for_start(void);
-void play_sound(uint16_t frequency);
 void reset_outputs(void);
 void manual_control(void);
 
 void setup() {
   setup_lights();
-
+  setup_receiver();
+  
+#ifdef PIEZO
+  setup_buzzer();
+#endif
+  
   // start serial
 #ifdef DEBUG
   Serial.begin(SERIAL_BAUD);
@@ -49,11 +47,6 @@ void setup() {
   
   output_pins[SERVO_ID].write(SERVO_IDLE);
   output_pins[THROT_ID].write(THROT_IDLE);
-  
-  // set piezo output
-  pinMode(BUZZER_PIN, OUTPUT);
-  
-  setup_receiver();
 }
 
 void loop() {
@@ -68,14 +61,15 @@ void loop() {
 
     while (true) {
       if (get_pwm(THROT_ID) < SHUTDOWN_THRESH) {
+        // return manual control if sitck pushed forward
         manual_control();
         break;
       }
 
 #ifdef SONAR
       if (millis() - last_sonar > SONAR_DELAY) {
+        // READ THE SONAR
         last_sonar = millis();
-        
       }
 #endif
 
@@ -87,7 +81,9 @@ void loop() {
   }
 }
 
-void wait_for_arm() {  
+void wait_for_arm() {
+  clear_all_lights();
+  
   uint8_t timer_counter = 0;
   while (true) {
     if (get_pwm(THROT_ID) > STARTUP_THRESH) {
@@ -131,6 +127,9 @@ void wait_for_start() {
 
 void manual_control() {
   reset_outputs();
+  clear_all_lights();
+  set_light(BLUE);
+  set_light(GREEN);
   while (get_pwm(THROT_ID) > STARTUP_THRESH || get_pwm(SERVO_ID) > STEERING_THRESH) {
     ;
   }
@@ -153,21 +152,6 @@ void manual_control() {
     delay(MANUAL_DELAY);
   }
   reset_outputs();
-}
-
-void play_sound(uint16_t frequency) {
-#ifndef PIEZO_OFF
-  for (uint16_t i = 0; i < BUZZ_DURATION/frequency; i++) {
-    digitalWrite(BUZZER_PIN, HIGH);
-    delayMicroseconds(frequency);
-    digitalWrite(BUZZER_PIN, LOW);
-    delayMicroseconds(frequency);
-    digitalWrite(BUZZER_PIN, HIGH);
-    delayMicroseconds(frequency);
-    digitalWrite(BUZZER_PIN, LOW);
-    delayMicroseconds(frequency);
-  }
-#endif
 }
 
 void reset_outputs() {

@@ -3,6 +3,12 @@
 // servo:   1032  1364  1700
 // throt:   1020  1556  2056
 
+// debug switch
+#define DEBUG  // enables debug messages
+#define SERIAL  // enables serial communications (in deployment this will be enabled)
+// #define SONAR  // enables sonar ranging
+#define BUZZER  // turns the piezo off for quiet debugging mode
+
 // serial paramters
 #define SERIAL_BAUD 115200
 #define BUFFER_SIZE 2
@@ -13,6 +19,11 @@
 #define SOUND_HIGH 100
 #define SOUND_MIDDLE 110
 #define SOUND_LOW 115
+
+// array values for accessing values
+#define SERVO_ID 0
+#define THROT_ID 1
+#define NUM_CHANNELS 2
 
 // output pins
 #define SERVO_TX 10

@@ -30,6 +30,12 @@ void clear_light(int pin) {
   digitalWrite(pin, LOW);
 }
 
+void clear_all_lights() {
+  for (int i = 0; i < NUM_LIGHTS; ++i) {
+    digitalWrite(lights[i], LOW);
+  }
+}
+
 void toggle_light(int pin) {
   digitalWrite(pin, !digitalRead(pin));
 }
