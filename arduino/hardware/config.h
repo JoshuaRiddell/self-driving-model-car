@@ -14,10 +14,6 @@
 #define SOUND_MIDDLE 110
 #define SOUND_LOW 115
 
-// reciever pins
-#define SERVO_RX 2
-#define THROT_RX 3
-
 // output pins
 #define SERVO_TX 10
 #define THROT_TX 11
@@ -29,12 +25,7 @@
 // specific thresholds
 #define SHUTDOWN_THRESH 1100  // less than this for shutdown
 #define STARTUP_THRESH 1930  // larger than this for startup
-#define ARM_CUTOFF 800 // ms to wait until arm
+#define ARM_CUTOFF 700 // ms to wait until arm
 #define STEERING_THRESH 1650 // larger than this to go into manual control mode
 #define MANUAL_DELAY 20
 #define MANUAL_CUTOFF 2000
-
-// array values for servo and throttle
-#define SERVO_ID 0
-#define THROT_ID 1
-#define NUM_CHANNELS 2

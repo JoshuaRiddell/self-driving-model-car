@@ -4,23 +4,21 @@
 #include "config.h"
 #include "ranging.h"
 #include "state_lights.h"
+#include "receiver.h"
 
+// TODO
 // add proper tones
 // add status LEDs
+// arg checking on serial input
 
 // debug switch
 #define DEBUG  // enables debug messages
 #define SERIAL  // enables serial communications (in deployment this will be enabled)
-// #define SONAR  // enables sonar ranging in the serial output
-#define PIEZO_OFF  // turns the piezo off for quiet debugging mode
+// #define SONAR  // enables sonar ranging
+// #define PIEZO_OFF  // turns the piezo off for quiet debugging mode
 
 // define pin arrays
-static const uint8_t input_pins[] = { SERVO_RX, THROT_RX };
 Servo output_pins[NUM_CHANNELS];
-
-// define pwm data caches
-volatile unsigned long prev_time[NUM_CHANNELS];
-volatile uint16_t pwm_val[NUM_CHANNELS];
 
 // define incoming bytes buffer
 byte incomingBuffer[BUFFER_SIZE];
@@ -37,7 +35,7 @@ void setup() {
   // start serial
 #ifdef DEBUG
   Serial.begin(SERIAL_BAUD);
-#endif  
+#endif
 
 #ifdef SONAR
   // sonar pin modes
@@ -45,23 +43,17 @@ void setup() {
   pinMode(SONAR_ECHO, INPUT);
 #endif
 
-  // reciever pin modes
-  pinMode(SERVO_RX, INPUT);
-  pinMode(THROT_RX, INPUT);
-
   // output pin modes
   output_pins[SERVO_ID].attach(SERVO_TX);
   output_pins[THROT_ID].attach(THROT_TX);
   
   output_pins[SERVO_ID].write(SERVO_IDLE);
   output_pins[THROT_ID].write(THROT_IDLE);
-
-  // attach unique pin interrupts
-  attachInterrupt(digitalPinToInterrupt(SERVO_RX), handle_servo_intr, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(THROT_RX), handle_throt_intr, CHANGE);
   
   // set piezo output
   pinMode(BUZZER_PIN, OUTPUT);
+  
+  setup_receiver();
 }
 
 void loop() {
@@ -75,7 +67,7 @@ void loop() {
 #endif
 
     while (true) {
-      if (pwm_val[THROT_ID] < SHUTDOWN_THRESH) {
+      if (get_pwm(THROT_ID) < SHUTDOWN_THRESH) {
         manual_control();
         break;
       }
@@ -98,7 +90,7 @@ void loop() {
 void wait_for_arm() {  
   uint8_t timer_counter = 0;
   while (true) {
-    if (pwm_val[THROT_ID] > STARTUP_THRESH) {
+    if (get_pwm(THROT_ID) > STARTUP_THRESH) {
       timer_counter += 1;
       if (timer_counter == 1) {
         set_light(BLUE);
@@ -118,7 +110,7 @@ void wait_for_arm() {
   delay(100);
   play_sound(SOUND_HIGH);
    
-  while (pwm_val[THROT_ID] > STARTUP_THRESH) {
+  while (get_pwm(THROT_ID) > STARTUP_THRESH) {
     ;
   }
   
@@ -130,7 +122,7 @@ void wait_for_arm() {
 }
 
 void wait_for_start() {
-  while (pwm_val[THROT_ID] < STARTUP_THRESH) {
+  while (get_pwm(THROT_ID) < STARTUP_THRESH) {
     ;
   }
   play_sound(SOUND_HIGH);
@@ -139,17 +131,17 @@ void wait_for_start() {
 
 void manual_control() {
   reset_outputs();
-  while (pwm_val[THROT_ID] > STARTUP_THRESH || pwm_val[SERVO_ID] > STEERING_THRESH) {
+  while (get_pwm(THROT_ID) > STARTUP_THRESH || get_pwm(SERVO_ID) > STEERING_THRESH) {
     ;
   }
   delay(500);
   play_sound(SOUND_HIGH);
   uint8_t timer_counter = 0;
   while (true) {
-    output_pins[SERVO_ID].writeMicroseconds(pwm_val[SERVO_ID]);
-    output_pins[THROT_ID].writeMicroseconds(pwm_val[THROT_ID]);
+    output_pins[SERVO_ID].writeMicroseconds(get_pwm(SERVO_ID));
+    output_pins[THROT_ID].writeMicroseconds(get_pwm(THROT_ID));
     
-    if (pwm_val[SERVO_ID] > STEERING_THRESH) {
+    if (get_pwm(SERVO_ID) > STEERING_THRESH) {
       timer_counter += 1;
       if (timer_counter > MANUAL_CUTOFF / MANUAL_DELAY) {
         play_sound(SOUND_HIGH);
@@ -161,25 +153,6 @@ void manual_control() {
     delay(MANUAL_DELAY);
   }
   reset_outputs();
-}
-
-void handle_servo_intr() {
-  // pass through current pin value
-  handle_interrupt(SERVO_ID, digitalRead(SERVO_RX));
-}
-
-void handle_throt_intr() {
-  // pass through current pin value
-  handle_interrupt(THROT_ID, digitalRead(THROT_RX));
-}
-
-void handle_interrupt(uint8_t pin_id, bool change) {
-  // handle the pwm counters
-  if (change) {
-    prev_time[pin_id] = micros();
-  } else {
-    pwm_val[pin_id] = micros() - prev_time[pin_id];
-  }
 }
 
 void play_sound(uint16_t frequency) {
