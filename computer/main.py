@@ -5,16 +5,14 @@ import server
 from time import sleep
 
 class MainApp(object):
-    def __init__(self):
+    def __init__(self, name):
         self.vis_int = vi.VisionInterface()
         self.har_int = hi.HardwareInterface()
 
+        self.server = server.Server(name)
+
     def run(self):
-	while True:
-		
-
-
-
+	# while True:
         sleep(5)
         self.har_int.write_pwm(hi.THROT, 0)
         sleep(2)
@@ -49,7 +47,7 @@ class MainApp(object):
 
 
 def main():
-    app = MainApp()
+    app = MainApp(__name__)
     app.run()
 
 if __name__ == "__main__":

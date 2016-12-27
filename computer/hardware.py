@@ -31,19 +31,48 @@ DEFAULT_DEVICE_BAUD = 115200
 
 class HardwareInterface(threading.Thread):
     def __init__(self):
+        # init resources for threading
         super(HardwareInterface, self).__init__()
+
+        # make a lock for the command send queue to the arduino
         self.lock = threading.Lock()
         self.daemon = True
 
-        self.connect_serial()
+        # write default device ports
+        self.device_port = DEFAULT_DEVICE_PORT
+        self.device_baud = DEFAULT_DEVICE_BAUD
 
-        self.flags = [None, None]
-        self.val_queue = [0, 0]
+        # attempt to connect to serial with defatuls
+        try:
+            self.ser = serial.Serial(self.device_port, self.device_baud,
+                    timeout=0.5)
+        except:
+            pass
+
+        self.flags = [None] * NUM_CHANNELS
+        self.val_queue = [0] * NUM_CHANNELS
 
         self.start()
 
-    def connect_serial(self):
-        self.ser = serial.Serial(DEVICE_PORT, DEVICE_BAUD, timeout=0.5)
+    def connect(self):
+        try:
+            self.ser.open()
+        except:
+            return -1
+        return 1
+
+    def disconnect(self):
+        self.ser.close()
+
+    def change_port(self, new_port):
+        self.ser.close()
+        self.ser.port = new_port
+
+    def change_baud(self, new_baud):
+        self.ser.close()
+        if new_baud not in self.ser.BAUDRATES:
+            return
+        self.ser.baudrate = new_baud
 
     def write_pwm(self, perp_id, val):
         if val < 0:
