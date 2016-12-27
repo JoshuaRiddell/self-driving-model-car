@@ -1,0 +1,16 @@
+body {
+}
+
+h1 {
+    color: navy;
+    margin-left: 20px;
+}
+
+div {
+    display: block;
+}
+
+.main {
+   width: 80%;
+   margin: auto; 
+}

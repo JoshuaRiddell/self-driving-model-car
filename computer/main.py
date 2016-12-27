@@ -1,9 +1,8 @@
 import vision as vi
 import hardware as hi
-from time import sleep
+import server
 
-SERVO = 0  # takes -100% to 100% value corresponding to left and right
-THROT = 1  # takes -100% to 100% value corresponding to reverse and forward
+from time import sleep
 
 class MainApp(object):
     def __init__(self):
@@ -11,14 +10,20 @@ class MainApp(object):
         self.har_int = hi.HardwareInterface()
 
     def run(self):
+	while True:
+		
+
+
+
         sleep(5)
-        self.har_int.write_pwm(THROT, 0)
+        self.har_int.write_pwm(hi.THROT, 0)
         sleep(2)
+
 
         print "starting"
 
         for i in range(9):
-            self.har_int.write_pwm(THROT, i)
+            self.har_int.write_pwm(hi.THROT, i)
             sleep(0.1)
 
         sleep(1.5)
@@ -29,10 +34,10 @@ class MainApp(object):
             # print steer
 
             if steer is None:
-                self.har_int.write_pwm(SERVO, 40)
+                self.har_int.write_pwm(hi.SERVO, 40)
                 continue
 
-            self.har_int.write_pwm(SERVO, steer)
+            self.har_int.write_pwm(hi.SERVO, steer)
 
         # while True:
         #     sleep(1)

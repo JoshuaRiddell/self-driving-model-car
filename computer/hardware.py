@@ -2,27 +2,32 @@ from time import sleep
 import serial
 import threading
 
+# define channel numbers
+NUM_CHANNELS = 2
+SERVO = 0
+THROT = 1
+
 # left, middle, right
 SERVO_POINTS = [47, 79, 112]
 # full, idle, rev
 THROT_POINTS = [47, 98, 146]
 
+# scaling factors to turn percentages into 8-bit Arduino PWM outputs
 OUTPUT_FACTORS = [
     [x[1] for x in [SERVO_POINTS, THROT_POINTS]],  # centres
     [(x[1]-x[0])/float(100) for x in [SERVO_POINTS, THROT_POINTS]],  # negative scaling
     [(x[2]-x[1])/float(100) for x in [SERVO_POINTS, THROT_POINTS]],  # positive scaling
 ]
 
+# TODO change this to happening on the arduino
+# limits on the pins
 PIN_BOUNDS = [
     [47, 112],
     [47, 146],
 ]
 
-NUM_CHANNELS = 2
-
-DEVICE_PORT = "/dev/ttyACM0"
-DEVICE_BAUD = 115200
-
+DEFAULT_DEVICE_PORT = "/dev/ttyACM0"
+DEFAULT_DEVICE_BAUD = 115200
 
 class HardwareInterface(threading.Thread):
     def __init__(self):
