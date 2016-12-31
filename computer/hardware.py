@@ -52,7 +52,7 @@ class HardwareInterface(threading.Thread):
         self.flags = [None] * NUM_CHANNELS
         self.val_queue = [0] * NUM_CHANNELS
 
-        self.start()
+#        self.start()
 
     def connect(self):
         try:

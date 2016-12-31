@@ -1,54 +1,24 @@
 import vision as vi
-import hardware as hi
+#import hardware as hi
+from threading import Thread, Lock
 import server
-
 from time import sleep
 
-class MainApp(object):
-    def __init__(self, name):
-        self.vis_int = vi.VisionInterface()
-        self.har_int = hi.HardwareInterface()
+class Main(Thread):
+    def __init__(self):
+        super(Main, self).__init__()
+        self.daemon = True
 
-        self.server = server.Server(name)
+        self.vis_int = vi.VisionInterface()
+#        self.har_int = hi.HardwareInterface()
 
     def run(self):
-	# while True:
-        sleep(5)
-        self.har_int.write_pwm(hi.THROT, 0)
-        sleep(2)
-
-
-        print "starting"
-
-        for i in range(9):
-            self.har_int.write_pwm(hi.THROT, i)
-            sleep(0.1)
-
-        sleep(1.5)
-
         while True:
-            steer = self.vis_int.read_frame()
-
-            # print steer
-
-            if steer is None:
-                self.har_int.write_pwm(hi.SERVO, 40)
-                continue
-
-            self.har_int.write_pwm(hi.SERVO, steer)
-
-        # while True:
-        #     sleep(1)
-        #     self.har_int.write_pwm(SERVO, -50)
-        #     sleep(1)
-        #     self.har_int.write_pwm(SERVO, 0)
-        #     sleep(1)
-        #     self.har_int.write_pwm(SERVO, 50)
-
-
-def main():
-    app = MainApp(__name__)
-    app.run()
+            self.vis_int.read_frame()
 
 if __name__ == "__main__":
-    main()
+    app = server.Server(__name__)
+    main = Main()
+    app.add_main(main)
+    main.start()
+    app.run()
