@@ -7,7 +7,7 @@ from threading import Lock
 # 120,   200,      230
 
 NUM_COLOURS = 2
-NUM_FRAMES = 1
+NUM_FRAMES = 2
 KERNEL_SIZE = 5
 
 BOUNDS = [
@@ -32,18 +32,26 @@ class VisionInterface(object):
         self.locks = [Lock()] * NUM_FRAMES
 
     def get_frame(self, frame_id):
+        if frame_id < 0 or frame_id > NUM_FRAMES - 1:
+            return None
         self.locks[frame_id].acquire()
         frame = self.frames[frame_id]
         self.locks[frame_id].release()
         return frame
 
-    def get_number_frames(self):
-        return len(self.frames)
+    def update_frame(self, frame, frame_id):
+        self.locks[frame_id].acquire()
+        self.frames[frame_id] = frame
+        self.locks[frame_id].release()
 
     def read_frame(self):
         # get the current frame
         ret, frame = self.cam.read()
         self.frames[0] = frame.copy()
+
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
+        self.frames[1] = gray.copy()
 
 
 #        # do a blur and convert colour space

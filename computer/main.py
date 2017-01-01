@@ -17,8 +17,11 @@ class Main(Thread):
             self.vis_int.read_frame()
 
 if __name__ == "__main__":
-    app = server.Server(__name__)
     main = Main()
-    app.add_main(main)
     main.start()
-    app.run()
+
+    app = server.WebServer(__name__)
+    socket = server.SocketServer(app, main.vis_int)
+
+    socket.run(app, host='0.0.0.0', debug=True, use_reloader=False,
+            threaded=True)

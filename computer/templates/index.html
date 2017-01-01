@@ -1,12 +1,17 @@
 <head>
   <link rel="stylesheet" type="text/css" href="static/style.css">
+  <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
   <script src="static/script.js"></script>
 </head>
 
 <body>
   <div class="main">
+    <button type="button">Connect</button>
+    <button type="button">Disconnect</button>
   </div>
 
-  <img style="-webkit-user-select: none" src="vid">
-  <img style="-webkit-user-select: none" src="pvid">
+  <div class="main">
+    <canvas id="video_0" width="640" height="480"></canvas>
+    <canvas id="video_1" width="640" height="480"></canvas>
+  </div>
 </body>
