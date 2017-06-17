@@ -4,7 +4,7 @@ from PIL import Image
 from StringIO import StringIO
 import base64
 
-DEFAULT_QUALITY = 50
+DEFAULT_QUALITY = 20
 
 class WebServer(Flask):
     def __init__(self, name):
