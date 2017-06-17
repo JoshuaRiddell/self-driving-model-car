@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 import vision as vi
 #import hardware as hi
 from threading import Thread, Lock
@@ -23,5 +25,5 @@ if __name__ == "__main__":
     app = server.WebServer(__name__)
     socket = server.SocketServer(app, main.vis_int)
 
-    socket.run(app, host='0.0.0.0', debug=True, use_reloader=False,
+    socket.run(app, host='10.1.0.1', port=5000, debug=True, use_reloader=False,
             threaded=True)

@@ -30,7 +30,7 @@ class SocketServer(SocketIO):
         frame = self.vis.get_frame(data['vid_id'])
         image = Image.fromarray(frame)
         buf = StringIO()
-        image.save(buf, 'JPEG', quality=30)
+        image.save(buf, 'JPEG', quality=self.stream_quality)
 
         data = {
             "raw": 'data:image/jpeg;base64,' +
