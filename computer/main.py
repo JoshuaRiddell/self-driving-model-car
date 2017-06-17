@@ -22,8 +22,7 @@ if __name__ == "__main__":
     main = Main()
     main.start()
 
-    app = server.WebServer(__name__)
-    socket = server.SocketServer(app, main.vis_int)
+    server.register_vis_int(main.vis_int)
+    server = server.WebServer(('0.0.0.0', 5000), server.CamHandler)
+    server.serve_forever()
 
-    socket.run(app, host='10.1.0.1', port=5000, debug=True, use_reloader=False,
-            threaded=True)

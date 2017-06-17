@@ -1,39 +1,56 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
-from PIL import Image
-from StringIO import StringIO
-import base64
+#!/usr/bin/python
+import cv2
+import Image
+import threading
+from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from SocketServer import ThreadingMixIn
+import StringIO
+import time
 
-DEFAULT_QUALITY = 20
+vis = None
 
-class WebServer(Flask):
-    def __init__(self, name):
-        super(WebServer, self).__init__(name)
-        self.add_url_rule('/', 'index', self.index)
-        self.add_url_rule('/vid/<int:vid_id>', 'video', self.video)
+class CamHandler(BaseHTTPRequestHandler):
+	def do_GET(self):
+		if self.path[-1].isdigit():
+			self.send_response(200)
+			self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
+			self.end_headers()
+			while True:
+				try:
+					img = vis.get_frame(int(self.path[-1]))
+                                        if img is None:
+                                            continue
 
-    def index(self):
-        return render_template('index.html')
+                                        try:
+                                            img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+                                        except:
+                                            pass
 
-    def video(self, vid_id):
-        return render_template('video.html', vid_id=vid_id)
+					jpg = Image.fromarray(img)
+					tmpFile = StringIO.StringIO()
+					jpg.save(tmpFile,'JPEG')
+					self.wfile.write("--jpgboundary")
+					self.send_header('Content-type','image/jpeg')
+					self.send_header('Content-length',str(tmpFile.len))
+					self.end_headers()
+					jpg.save(self.wfile,'JPEG')
+					time.sleep(0.1)
+				except KeyboardInterrupt:
+					break
+			return
+		if self.path.endswith('.html'):
+			self.send_response(200)
+			self.send_header('Content-type','text/html')
+			self.end_headers()
+			self.wfile.write('<html><head></head><body>')
+			self.wfile.write('<img src="http://127.0.0.1:8080/cam.mjpg"/>')
+			self.wfile.write('</body></html>')
+			return
 
-class SocketServer(SocketIO):
-    def __init__(self, app, vis):
-        super(SocketServer, self).__init__(app)
-        self.stream_quality = DEFAULT_QUALITY
-        self.vis = vis
 
-        self.on_event('stream', self.stream_frame)
+class WebServer(ThreadingMixIn, HTTPServer):
+    pass
 
-    def stream_frame(self, data):
-        frame = self.vis.get_frame(data['vid_id'])
-        image = Image.fromarray(frame)
-        buf = StringIO()
-        image.save(buf, 'JPEG', quality=self.stream_quality)
-
-        data = {
-            "raw": 'data:image/jpeg;base64,' +
-                base64.b64encode(buf.getvalue())
-        }
-        emit('stream', data)
+def register_vis_int(vis_int):
+    global vis
+    vis = vis_int
