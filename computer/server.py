@@ -7,47 +7,52 @@ import StringIO
 import time
 
 vision = None
-RESOLUTION = (854, 480)
+MAX_DIM = 700
 
 class CamHandler(BaseHTTPRequestHandler):
-	def do_GET(self):
-		if self.path[-1].isdigit():
-			self.send_response(200)
-			self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
-			self.end_headers()
-			while True:
-				try:
-					img = vision.get_frame(int(self.path[-1]))
-                                        img = cv2.resize(img, RESOLUTION,
-                                                interpolation=cv2.cv.CV_INTER_AREA)
-                                        if img is None:
-                                            continue
+    def do_GET(self):
+        if self.path[-1].isdigit():
+            self.send_response(200)
+            self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
+            self.end_headers()
+            while True:
+                try:
+                    img = vision.get_frame(int(self.path[-1]))
 
-                                        try:
-                                            img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-                                        except:
-                                            pass
+                    scale = MAX_DIM / float(max([img.shape[0], img.shape[1]]))
 
-					jpg = Image.fromarray(img)
-					tmpFile = StringIO.StringIO()
-					jpg.save(tmpFile,'JPEG')
-					self.wfile.write("--jpgboundary")
-					self.send_header('Content-type','image/jpeg')
-					self.send_header('Content-length',str(tmpFile.len))
-					self.end_headers()
-					jpg.save(self.wfile,'JPEG')
-					time.sleep(0.1)
-				except KeyboardInterrupt:
-					break
-			return
-		if self.path.endswith('.html'):
-			self.send_response(200)
-			self.send_header('Content-type','text/html')
-			self.end_headers()
-			self.wfile.write('<html><head></head><body>')
-			self.wfile.write('<img src="http://127.0.0.1:8080/cam.mjpg"/>')
-			self.wfile.write('</body></html>')
-			return
+                    img = cv2.resize(
+                            img,
+                            (int(img.shape[1]*scale), int(img.shape[0]*scale)),
+                            interpolation=cv2.cv.CV_INTER_AREA)
+                    if img is None:
+                        continue
+
+                    try:
+                        img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+                    except:
+                        pass
+
+                    jpg = Image.fromarray(img)
+                    tmpFile = StringIO.StringIO()
+                    jpg.save(tmpFile,'JPEG')
+                    self.wfile.write("--jpgboundary")
+                    self.send_header('Content-type','image/jpeg')
+                    self.send_header('Content-length',str(tmpFile.len))
+                    self.end_headers()
+                    jpg.save(self.wfile,'JPEG')
+                    time.sleep(0.1)
+                except KeyboardInterrupt:
+                    break
+            return
+        if self.path.endswith('.html'):
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
+            self.end_headers()
+            self.wfile.write('<html><head></head><body>')
+            self.wfile.write('<img src="http://127.0.0.1:8080/cam.mjpg"/>')
+            self.wfile.write('</body></html>')
+            return
 
 
 class WebServer(ThreadingMixIn, HTTPServer):
