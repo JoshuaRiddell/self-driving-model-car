@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import cv2
 import Image
 import threading

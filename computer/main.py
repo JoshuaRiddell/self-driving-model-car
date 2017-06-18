@@ -11,12 +11,12 @@ class Main(Thread):
         super(Main, self).__init__()
         self.daemon = True
 
-        self.vis_int = vi.VisionInterface()
-#        self.har_int = hi.HardwareInterface()
+        self.vision = vi.VisionInterface()
+#        self.hardware = hi.HardwareInterface()
 
     def run(self):
         while True:
-            self.vis_int.read_frame()
+            self.vision.read_frame()
 
 if __name__ == "__main__":
     main = Main()
