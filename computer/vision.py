@@ -6,9 +6,16 @@ from threading import Lock
 # right, straight, left
 # 120,   200,      230
 
+MATRIX_FILENAME = "perspective_matrix.txt"
+
 NUM_COLOURS = 2
 NUM_FRAMES = 2
 KERNEL_SIZE = 5
+
+USE_PROJECTION = True
+
+# will be overriden by projection matrix if there is one
+DEFAULT_RESOLUTION = (1920, 1080)
 
 BOUNDS = [
     [[ 26,  28, 178], [ 30, 238, 230]], # yellow
@@ -26,6 +33,8 @@ for i in range(len(BOUNDS)):
 
 class VisionInterface(object):
     def __init__(self, camera_id=0):
+        self.get_perspective_matrix()
+
         self.cam = cv.VideoCapture(camera_id)
         self.cam.set(cv.cv.CV_CAP_PROP_FRAME_WIDTH, 1920);
         self.cam.set(cv.cv.CV_CAP_PROP_FRAME_HEIGHT, 1080);
@@ -33,6 +42,30 @@ class VisionInterface(object):
         ret, initial_frame = self.cam.read()
         self.frames = [initial_frame.copy()] * NUM_FRAMES
         self.locks = [Lock()] * NUM_FRAMES
+
+
+    def get_perspective_matrix(self):
+        try:
+            fd = open(MATRIX_FILENAME, 'r')
+
+            coords = eval(fd.readline())
+            map_to = eval(fd.readline())
+            self.cam_res = tuple(eval(fd.readline()))
+            self.res = tuple(eval(fd.readline()))
+
+            self.M = cv.getPerspectiveTransform(
+                    np.array(coords, np.float32),
+                    np.array(map_to, np.float32))
+
+            fd.close()
+
+            print "Perspective loaded"
+
+        except:
+            self.cam_res = DEFAULT_RESOLUTION
+            self.res = DEFAULT_RESOLUTION
+
+            print "Perspective failed to load"
 
     def get_frame(self, frame_id):
         if frame_id < 0 or frame_id > NUM_FRAMES - 1:
