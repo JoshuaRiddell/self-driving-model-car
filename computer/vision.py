@@ -27,6 +27,9 @@ for i in range(len(BOUNDS)):
 class VisionInterface(object):
     def __init__(self, camera_id=0):
         self.cam = cv.VideoCapture(camera_id)
+        self.cam.set(cv.cv.CV_CAP_PROP_FRAME_WIDTH, 1920);
+        self.cam.set(cv.cv.CV_CAP_PROP_FRAME_HEIGHT, 1080);
+
         ret, initial_frame = self.cam.read()
         self.frames = [initial_frame.copy()] * NUM_FRAMES
         self.locks = [Lock()] * NUM_FRAMES

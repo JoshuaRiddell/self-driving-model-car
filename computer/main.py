@@ -22,7 +22,7 @@ if __name__ == "__main__":
     main = Main()
     main.start()
 
-    server.register_vis_int(main.vis_int)
+    server.register_vision(main.vision)
     server = server.WebServer(('0.0.0.0', 5000), server.CamHandler)
     server.serve_forever()
 

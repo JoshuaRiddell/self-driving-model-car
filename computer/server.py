@@ -6,7 +6,8 @@ from SocketServer import ThreadingMixIn
 import StringIO
 import time
 
-vis = None
+vision = None
+RESOLUTION = (854, 480)
 
 class CamHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
@@ -16,7 +17,9 @@ class CamHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			while True:
 				try:
-					img = vis.get_frame(int(self.path[-1]))
+					img = vision.get_frame(int(self.path[-1]))
+                                        img = cv2.resize(img, RESOLUTION,
+                                                interpolation=cv2.cv.CV_INTER_AREA)
                                         if img is None:
                                             continue
 
@@ -50,6 +53,6 @@ class CamHandler(BaseHTTPRequestHandler):
 class WebServer(ThreadingMixIn, HTTPServer):
     pass
 
-def register_vis_int(vis_int):
-    global vis
-    vis = vis_int
+def register_vision(vision_interface):
+    global vision
+    vision = vision_interface
