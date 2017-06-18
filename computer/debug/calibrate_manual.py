@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import glob
 
+MATRIX_FILENAME = '../perspective_matrix.txt'
+
 # sub pixel corner algorithm
 STOP_CRIT = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 # pixel box to search for corner in
@@ -10,14 +12,14 @@ SEARCH_BOX = (20, 20)
 # camera resolution
 RES = (1280, 720)
 # warped output dimensions
-OUT_RES = (720, 1280)
+OUT_RES = (1800, 1280)
 # warped output scale
-SCALE = 1
+SCALE = 0.1
 
 # mapping from sqare test strip to output
-VER_CENT = OUT_RES[0]*3/4
 HOR_CENT = OUT_RES[0]/2
 INC = OUT_RES[0]/4 * SCALE
+VER_CENT = OUT_RES[1] - INC*2
 MAP_TO = np.array((
     (HOR_CENT - INC, VER_CENT - INC),
     (HOR_CENT + INC, VER_CENT - INC),
@@ -65,6 +67,22 @@ def main():
     genMatrix = False
     M = None
 
+    try:
+        fd = open(MATRIX_FILENAME, 'r')
+
+        coords = eval(fd.readline())
+
+        M = cv2.getPerspectiveTransform(
+                np.array(coords, np.float32),
+                MAP_TO);
+
+        fd.close()
+
+        print "Loaded stored perspective"
+    except:
+        M = None
+        pass
+
     while True:
         img = get_image(cam)
         if not img.any():
@@ -82,6 +100,7 @@ def main():
         elif clicked == 2:
             if len(coords) > 0:
                 coords.pop()
+                print (len(coords))
             clicked = False
 
         # print clicked coords
@@ -92,6 +111,16 @@ def main():
             M = cv2.getPerspectiveTransform(np.array(coords, np.float32), MAP_TO)
 
             print M
+
+            fd = open(MATRIX_FILENAME, 'w')
+            fd.write(str(list([list(x) for x in coords])))
+            fd.write("\n")
+            fd.write(str(list([list(x) for x in MAP_TO])))
+            fd.write("\n")
+            fd.write(str(list(RES)))
+            fd.write("\n")
+            fd.write(str(list(OUT_RES)))
+            fd.close()
 
             coords = []
             genMatrix = False;
