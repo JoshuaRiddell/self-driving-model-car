@@ -9,7 +9,7 @@ from threading import Lock
 MATRIX_FILENAME = "perspective_matrix.txt"
 
 NUM_COLOURS = 2
-NUM_FRAMES = 2
+NUM_FRAMES = 3
 KERNEL_SIZE = 5
 
 USE_PROJECTION = True
@@ -36,8 +36,8 @@ class VisionInterface(object):
         self.get_perspective_matrix()
 
         self.cam = cv.VideoCapture(camera_id)
-        self.cam.set(cv.cv.CV_CAP_PROP_FRAME_WIDTH, 1920);
-        self.cam.set(cv.cv.CV_CAP_PROP_FRAME_HEIGHT, 1080);
+        self.cam.set(cv.cv.CV_CAP_PROP_FRAME_WIDTH, self.cam_res[0]);
+        self.cam.set(cv.cv.CV_CAP_PROP_FRAME_HEIGHT, self.cam_res[1]);
 
         ret, initial_frame = self.cam.read()
         self.frames = [initial_frame.copy()] * NUM_FRAMES
@@ -88,6 +88,9 @@ class VisionInterface(object):
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
         self.frames[1] = gray.copy()
+
+        warped = cv.warpPerspective(frame, self.M, self.res)
+        self.frames[2] = warped.copy()
 
 
 #        # do a blur and convert colour space
