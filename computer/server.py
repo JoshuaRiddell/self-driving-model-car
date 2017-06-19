@@ -11,7 +11,7 @@ import time
 vision = None
 
 # maximum dimension of sent frame (smaller is faster)
-MAX_DIM = 700
+MAX_DIM = 400
 
 class CamHandler(BaseHTTPRequestHandler):
     """Handles http request for camera frames.
@@ -43,11 +43,10 @@ class CamHandler(BaseHTTPRequestHandler):
                                 (int(img.shape[1]*scale), int(img.shape[0]*scale)),
                                 interpolation=cv2.cv.CV_INTER_AREA)
 
-                        if (img[0][0][0] != img[0][0][1] != img[0][0][2]):
+                        if not (img[0][0][0] == img[0][0][1] == img[0][0][2]):
                             # try converting to rgb, won't work for grayscale images
                             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
                     except:
-                        img = None
                         pass
 
                     if img is None:
