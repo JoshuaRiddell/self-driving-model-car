@@ -126,8 +126,7 @@ class VisionInterface(object):
 
         self.update_frame(1, gray)
 
-        # warped = cv.warpPerspective(frame, self.M, self.res)
-        warped = img
+        warped = cv.warpPerspective(frame, self.M, self.res)
         self.update_frame(2, warped)
 
 
