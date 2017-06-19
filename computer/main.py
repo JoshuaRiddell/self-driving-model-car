@@ -25,7 +25,9 @@ class Main(Thread):
         """
 
         while True:
-            self.vision.read_frame()
+            if self.hardware.get_state() == hi.AUTO:
+                self.vision.read_frame()
+                print "frame processed"
 
 if __name__ == "__main__":
     # make the main thread and start it

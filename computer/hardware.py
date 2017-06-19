@@ -34,10 +34,10 @@ BAUD = 115200
 HARDWARE_PATH = "../hardware/hardware.ino"
 
 # message types
-HARDWARE_DISARMED = 1
-HARDWARE_ARMED = 2
-HARDWARE_AUTO = 3
-HARDWARE_MANUAL = 4
+DISARMED = 0
+ARMED = 1
+AUTO = 2
+MANUAL = 3
 
 STATE_ARRAY = [
     "DISARMED",
@@ -97,6 +97,12 @@ class HardwareInterface(Thread):
         """
         self.ser.close()
 
+    def add_to_pwm_queue(self, perp_id, val):
+        self.txLock.acquire()
+        self.val_queue[perp_id] = val
+        self.flags[perp_id] = True
+        self.txLock.release()
+
     def write_pwm(self, perp_id, val):
         """Send a PWM value over serial (blocking).
         """
@@ -114,6 +120,12 @@ class HardwareInterface(Thread):
             self.ser.write(chr(int(perp_id)))
             self.ser.write(chr(int(val)))
 
+    def get_state(self):
+        self.stateLock.acquire()
+        state = self.state
+        self.stateLock.release()
+        return state
+
     def run(self):
         """Thread for serial communications.
         """
@@ -122,13 +134,13 @@ class HardwareInterface(Thread):
             self.txLock.acquire()
             flags = self.flags
             val_queue = self.val_queue
-            self.flags = [None, None]
+            self.flags = [False, False]
             self.txLock.release()
 
             # write a pwm value if the value has changed
             for i in range(NUM_CHANNELS):
-                if flags[i] is not None:
-                    write_pwm(i, val_queue[i])
+                if flags[i]:
+                    self.write_pwm(i, val_queue[i])
 
             # read a serial value
             if self.ser.inWaiting():
