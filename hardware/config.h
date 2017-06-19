@@ -4,8 +4,8 @@
 // throt:   1020  1556  2056
 
 // debug switch
-#define DEBUG  // enables debug messages
-#define SERIAL  // enables serial communications (in deployment this will be enabled)
+#define ENABLE_DEBUG  // enables debug messages
+#define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
 // #define SONAR  // enables sonar ranging
 #define BUZZER  // turns the piezo off for quiet debugging mode
 
