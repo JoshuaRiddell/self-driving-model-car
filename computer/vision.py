@@ -58,6 +58,7 @@ class VisionInterface(object):
         # networking thread
         ret, initial_frame = self.cam.read()
         self.frames = [initial_frame.copy()] * NUM_FRAMES
+        self.flags = [False] * NUM_FRAMES
         self.locks = [Lock()] * NUM_FRAMES
 
     def get_perspective_matrix(self):
@@ -97,15 +98,20 @@ class VisionInterface(object):
         if frame_id < 0 or frame_id > NUM_FRAMES - 1:
             return None
         self.locks[frame_id].acquire()
-        frame = self.frames[frame_id]
+        if self.flags[frame_id]:
+            frame = self.frames[frame_id]
+            self.flags[frame_id] = False
+        else:
+            frame = None
         self.locks[frame_id].release()
         return frame
 
-    def update_frame(self, frame, frame_id):
+    def update_frame(self, frame_id, frame):
         """Threadsafe function to update a frame in the frame stream.
         """
         self.locks[frame_id].acquire()
-        self.frames[frame_id] = frame
+        self.frames[frame_id] = frame.copy()
+        self.flags[frame_id] = True
         self.locks[frame_id].release()
 
     def read_frame(self):
@@ -114,14 +120,15 @@ class VisionInterface(object):
         """
         # get the current frame
         ret, frame = self.cam.read()
-        self.frames[0] = frame.copy()
+        self.update_frame(0, frame)
 
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-        self.frames[1] = gray.copy()
+        self.update_frame(1, gray)
 
-        warped = cv.warpPerspective(frame, self.M, self.res)
-        self.frames[2] = warped.copy()
+        # warped = cv.warpPerspective(frame, self.M, self.res)
+        warped = img
+        self.update_frame(2, warped)
 
 
 #        # do a blur and convert colour space

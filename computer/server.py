@@ -33,20 +33,25 @@ class CamHandler(BaseHTTPRequestHandler):
                 try:
                     # get a frame from the vision stream
                     img = vision.get_frame(int(self.path[-1]))
-
-                    # scale the frame to save memory
-                    scale = MAX_DIM / float(max([img.shape[0], img.shape[1]]))
-                    img = cv2.resize(img,
-                            (int(img.shape[1]*scale), int(img.shape[0]*scale)),
-                            interpolation=cv2.cv.CV_INTER_AREA)
                     if img is None:
                         continue
 
-                    # try converting to rgb, won't work for grayscale images
                     try:
-                        img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+                        # scale the frame to save memory
+                        scale = MAX_DIM / float(max([img.shape[0], img.shape[1]]))
+                        img = cv2.resize(img,
+                                (int(img.shape[1]*scale), int(img.shape[0]*scale)),
+                                interpolation=cv2.cv.CV_INTER_AREA)
+
+                        if (img[0][0][0] != img[0][0][1] != img[0][0][2]):
+                            # try converting to rgb, won't work for grayscale images
+                            img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
                     except:
+                        img = None
                         pass
+
+                    if img is None:
+                        continue
 
                     # make a jpeg and send it
                     jpg = Image.fromarray(img)
