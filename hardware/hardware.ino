@@ -26,13 +26,13 @@ void manual_control(void);
 void setup() {
   setup_lights();
   setup_receiver();
-  
+
 #ifdef BUZZER
   setup_buzzer();
 #endif
-  
+
   // start serial
-#ifdef DEBUG
+#ifdef ENABLE_DEBUG
   Serial.begin(SERIAL_BAUD);
 #endif
 
@@ -45,14 +45,19 @@ void setup() {
   // output pin modes
   output_pins[SERVO_ID].attach(SERVO_TX);
   output_pins[THROT_ID].attach(THROT_TX);
-  
+
   output_pins[SERVO_ID].write(SERVO_IDLE);
   output_pins[THROT_ID].write(THROT_IDLE);
 }
 
 void loop() {
+  Serial.write(SERIAL_DISARMED);
   wait_for_arm();
+
+  Serial.write(SERIAL_ARMED);
   wait_for_start();
+
+  Serial.write(SERIAL_AUTO);
 
 #ifdef SONAR
   unsigned long last_sonar = 0;  // the time that the sonar was last read
@@ -61,6 +66,7 @@ void loop() {
   while (true) {
     if (get_pwm(THROT_ID) < SHUTDOWN_THRESH) {
       // return manual control if sitck pushed forward
+      Serial.write(SERIAL_MANUAL);
       manual_control();
       break;
     }
@@ -82,7 +88,7 @@ void loop() {
 void wait_for_arm() {
   clear_all_lights();
   set_light(WHITE);
-  
+
   uint8_t timer_counter = 0;
   while (true) {
     if (get_pwm(THROT_ID) > STARTUP_THRESH) {
@@ -104,11 +110,11 @@ void wait_for_arm() {
   play_sound(SOUND_HIGH);
   delay(100);
   play_sound(SOUND_HIGH);
-   
+
   while (get_pwm(THROT_ID) > STARTUP_THRESH) {
     ;
   }
-  
+
   play_sound(SOUND_LOW);
   set_light(GREEN);
   clear_light(BLUE);
@@ -121,11 +127,11 @@ void wait_for_start() {
   clear_all_lights();
   set_light(WHITE);
   set_light(GREEN);
-  
+
   while (get_pwm(THROT_ID) < STARTUP_THRESH) {
     ;
   }
-  
+
   play_sound(SOUND_HIGH);
   clear_light(WHITE);
   // currently lit: green
@@ -139,12 +145,15 @@ void manual_control() {
   set_light(GREEN);
   play_sound(SOUND_HIGH);
 
+  // delay to allow user to remove finger from brake
+  delay(1000);
+
   uint8_t timer_counter = 0;
   while (true) {
     output_pins[SERVO_ID].writeMicroseconds(get_pwm(SERVO_ID));
     output_pins[THROT_ID].writeMicroseconds(get_pwm(THROT_ID));
 
-    if (get_pwm(THROT_ID) < SHUTDOWN_THRESH && get_pwm(SERVO_ID) > STEERING_THRESH) {
+    if (get_pwm(THROT_ID) < THROTTLE_IDLE && get_pwm(SERVO_ID) > STEERING_THRESH) {
       timer_counter += 1;
       if (timer_counter > MANUAL_CUTOFF / MANUAL_DELAY) {
         play_sound(SOUND_HIGH);
@@ -153,7 +162,7 @@ void manual_control() {
     }
     delay(MANUAL_DELAY);
   }
-  
+
   reset_outputs();
 }
 

@@ -34,7 +34,17 @@ BAUD = 115200
 HARDWARE_PATH = "../hardware/hardware.ino"
 
 # message types
-MSG_PWM = 0
+HARDWARE_DISARMED = 1
+HARDWARE_ARMED = 2
+HARDWARE_AUTO = 3
+HARDWARE_MANUAL = 4
+
+STATE_ARRAY = [
+    "DISARMED",
+    "ARMED",
+    "AUTO",
+    "MANUAL"
+]
 
 class HardwareInterface(Thread):
     """Handles serial interfacing with the arduino.
@@ -47,8 +57,12 @@ class HardwareInterface(Thread):
         super(HardwareInterface, self).__init__()
         self.daemon = True
 
-        # make a lock for the command send queue to the arduino
-        self.lock = Lock()
+        # make a lock for the send queue
+        self.txLock = Lock()
+
+        # resources for car state
+        self.state = -1;
+        self.stateLock = Lock()
 
         # attempt to connect to serial with defatuls
         self.ser = serial.Serial(PORT, BAUD,
@@ -57,7 +71,7 @@ class HardwareInterface(Thread):
         self.flags = [None] * NUM_CHANNELS
         self.val_queue = [0] * NUM_CHANNELS
 
-        #self.start()
+        self.start()
 
     def upload_to_board(self):
         """UNTESTED
@@ -81,7 +95,7 @@ class HardwareInterface(Thread):
     def disconnect(self):
         """Disconnect from Arduino.
         """
-       self.ser.close()
+        self.ser.close()
 
     def write_pwm(self, perp_id, val):
         """Send a PWM value over serial (blocking).
@@ -105,11 +119,11 @@ class HardwareInterface(Thread):
         """
         while True:
             # get the lock and check if there are values to send
-            self.lock.acquire()
+            self.txLock.acquire()
             flags = self.flags
             val_queue = self.val_queue
             self.flags = [None, None]
-            self.lock.release()
+            self.txLock.release()
 
             # write a pwm value if the value has changed
             for i in range(NUM_CHANNELS):
@@ -118,8 +132,9 @@ class HardwareInterface(Thread):
 
             # read a serial value
             if self.ser.inWaiting():
-                self.ser.read()
-                pass
-                # print self.ser.read()
+                self.stateLock.acquire()
+                self.state = int(self.ser.read())
+                print "state {0}".format(STATE_ARRAY[self.state])
+                self.stateLock.release()
 
             sleep(0.02)

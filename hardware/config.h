@@ -39,5 +39,15 @@
 #define STARTUP_THRESH 1930  // larger than this for startup
 #define ARM_CUTOFF 700 // ms to wait until arm
 #define STEERING_THRESH 1650 // larger than this to go into manual control mode
+#define THROTTLE_IDLE 1570
 #define MANUAL_DELAY 20
 #define MANUAL_CUTOFF 2000
+
+// serial signals (bytes)
+#define SERIAL_DISARMED '0'
+#define SERIAL_ARMED '1'
+#define SERIAL_AUTO '2'
+#define SERIAL_MANUAL '3'
+
+
+

@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 
 import vision as vi
-#import hardware as hi
+import hardware as hi
 from threading import Thread, Lock
 import server
 from time import sleep
@@ -18,7 +18,7 @@ class Main(Thread):
         self.daemon = True
 
         self.vision = vi.VisionInterface()
-#        self.hardware = hi.HardwareInterface()
+        self.hardware = hi.HardwareInterface()
 
     def run(self):
         """Main control loop.
