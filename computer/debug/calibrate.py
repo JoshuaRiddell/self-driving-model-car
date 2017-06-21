@@ -1,3 +1,11 @@
+# left click to place a point on a rectangular reference
+# right click to cancel point placement
+# order should be:
+# 1-----2
+# |     |
+# |     |
+# 3-----4
+
 import numpy as np
 import cv2
 import glob
