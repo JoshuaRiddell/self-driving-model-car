@@ -61,6 +61,8 @@ class VisionInterface(object):
         self.flags = [False] * NUM_FRAMES
         self.locks = [Lock()] * NUM_FRAMES
 
+        self.frame_index = 0
+
     def get_perspective_matrix(self):
         """Loads a perspective matrix from file to transform perspective to
         overhead view. If not available will just set the resolution.
@@ -113,6 +115,19 @@ class VisionInterface(object):
         self.frames[frame_id] = frame.copy()
         self.flags[frame_id] = True
         self.locks[frame_id].release()
+
+    def save_frame(self, frame_id, path):
+        """
+        """
+        cv.imwrite(path + "/" + str(self.frame_index) + ".jpg", self.frames[frame_id]);
+
+        self.frame_index += 1
+
+    def read_raw_frame(self):
+        """Reads a frame and adds it to buffer position 0.
+        """
+        ret, frame = self.cam.read()
+        self.update_frame(0, frame)
 
     def read_frame(self):
         """Reads a frame and performs most of the cv logic. Updates the
