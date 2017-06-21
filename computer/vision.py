@@ -13,31 +13,12 @@ MATRIX_FILENAME = "perspective_matrix.txt"
 NUM_COLOURS = 2
 # number of frames to store for streaming
 NUM_FRAMES = 3
-# kernel size for blur filter
-KERNEL_SIZE = 5
 
 # use a projection for topdown perspective
 USE_PERSPECTIVE = True
 
 # will be overriden by projection matrix information if it's activated
 DEFAULT_RESOLUTION = (1920, 1080)
-
-# bounds of colours (hsv) values
-BOUNDS = [
-    [[ 26,  28, 178], [ 30, 238, 230]], # yellow
-    [[0,0,0], [255,255,255]], # blue
-]
-
-# crops to isolate different colours
-CROP = [
-    [[466, 150], [633, 377]],  # yellow crop
-    [[0, 0], [100, 100]], # blue crop
-]
-
-# transform bounds into easy to use format
-for i in range(len(BOUNDS)):
-    for j in range(len(BOUNDS[i])):
-        BOUNDS[i][j] = np.array(BOUNDS[i][j])
 
 class VisionInterface(object):
     """Contains all interfaces with the webcam.
@@ -145,14 +126,6 @@ class VisionInterface(object):
         self.update_frame(2, warped)
 
 
-#        # do a blur and convert colour space
-#        frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE))
-#        frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-#
-#        # threshold images
-#        thresh = cv.inRange(
-#            frame[CROP[0][0][1]:CROP[0][1][1], CROP[0][0][0]:CROP[0][1][0]],
-#            *BOUNDS[0])
 #
 #        contours, heirarchy = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 #
