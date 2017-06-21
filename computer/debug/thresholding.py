@@ -33,26 +33,28 @@ def load_bounds():
         raise
 
     # convert bounds to numpy arrays
+    retval = BOUNDS[:]
     for i in range(len(BOUNDS)):
         for j in range(len(BOUNDS[i])):
             BOUNDS[i][j] = np.array(BOUNDS[i][j])
+            retval[i][j] = np.array(BOUNDS[i][j][:])
 
-    return BOUNDS[:]
+    return retval
 
 def apply_filters(frame):
     # do a blur and convert colour space
-    frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE), normalize=True)
+    # frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE), normalize=True)
     frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
     return frame
 
 def get_binary(frame, index, bounds=None, crop=None):
     # use default bounds if not specified
-    if bounds is None:
-        bounds = BOUNDS
+    #if bounds is None:
+    #    bounds = BOUNDS
 
     # apply filters to image and convert colour space
-    apply_filters(frame)
+    frame = apply_filters(frame)
 
     # threshold images
     thresh = cv.inRange(frame, *bounds[index])

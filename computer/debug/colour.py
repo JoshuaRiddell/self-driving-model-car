@@ -58,12 +58,12 @@ bounds = load_bounds()
 bounds_index = 0
 
 while True:
+    key = cv2.waitKey(0)
+
     print "frame: {0}".format(image_index)
     img = cv2.imread(images[image_index])
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    cv2.imshow('main', img)
-    key = cv2.waitKey(0)
 
     if key == KEY_Q:
         break
@@ -94,8 +94,8 @@ while True:
 
     # expand if left click
     if clicked == 1 or clicked == 2:
-        img = apply_filters(img)
-        new_coord = list(img[coordinate[1]][coordinate[0]])
+        filtered = apply_filters(img)
+        new_coord = list(filtered[coordinate[1]][coordinate[0]])
         print new_coord
 
         if clicked == 1:
@@ -117,6 +117,7 @@ while True:
 
     thresh = get_binary(img, bounds_index, bounds=bounds)
     cv2.imshow("thresh", thresh)
+    cv2.imshow('main', img)
 
 cv2.destroyAllWindows()
 
