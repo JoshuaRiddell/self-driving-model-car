@@ -22,7 +22,7 @@ def load_bounds():
 
     # read arrays from file
     try:
-        fd = open(THRESH_FILENAME)
+        fd = open(THRESH_FILENAME, 'r')
 
         for i in range(len(BOUNDS)):
             BOUNDS[i] = eval(fd.readline())

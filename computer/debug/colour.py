@@ -3,7 +3,7 @@
 import numpy as np
 import cv2
 import glob
-from thresholding import *
+from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME
 
 RIGHT_ARROW = 1113939
 LEFT_ARROW = 1113937
@@ -76,6 +76,14 @@ while True:
     elif key == KEY_3:
         print "Editing obstacle track"
         bounds_index = 2
+    elif key == KEY_S:
+        print "Saving..."
+
+        fd = open(THRESH_FILENAME, 'w')
+        for bound in bounds:
+            fd.write(str([list(x) for x in bound]))
+            fd.write("\n")
+        fd.close()
 
     inc = INCREMENTS.get(key)
     if inc == None:
