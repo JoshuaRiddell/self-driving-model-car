@@ -13,8 +13,8 @@ void setup_receiver() {
   // reciever pin modes
   pinMode(SERVO_RX, INPUT);
   pinMode(THROT_RX, INPUT);
-  
-  // attach unique pin interrupts
+
+  // attach unique pin interrupts for throttle and servo
   attachInterrupt(digitalPinToInterrupt(SERVO_RX), handle_servo_intr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(THROT_RX), handle_throt_intr, CHANGE);
 }
