@@ -8,7 +8,6 @@
 
 import numpy as np
 import cv2
-import glob
 
 # file to store the finished matrix in
 MATRIX_FILENAME = '../perspective_matrix.txt'
