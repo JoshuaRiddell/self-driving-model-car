@@ -3,7 +3,7 @@
 import numpy as np
 import cv2
 import glob
-from thresholding import get_binary
+from thresholding import *
 
 RIGHT_ARROW = 1113939
 LEFT_ARROW = 1113937
@@ -50,6 +50,8 @@ cv2.setMouseCallback('main', handle_mouse)
 samples = []
 bounds = [[0, 0, 0], [0, 0, 0]]
 
+load_binary()
+
 while True:
     print "frame: {0}".format(image_index)
     img = cv2.imread(images[image_index])
@@ -70,6 +72,7 @@ while True:
 
     if clicked == 1:
         new_coord = list(img[coordinate[1]][coordinate[0]])
+        print new_coord
         samples.append(new_coord)
 
         clicked = 0
