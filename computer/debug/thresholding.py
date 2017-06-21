@@ -16,7 +16,7 @@ BOUNDS = [None] * 3
 # kernel size for blur filter
 KERNEL_SIZE = 5
 
-def load_binary():
+def load_bounds():
     global BOUNDS
     global KERNEL_SIZE
 
@@ -32,19 +32,30 @@ def load_binary():
         print "Colour thresholds could not be loaded"
         raise
 
-    # transform bounds into easy to use format
+    # convert bounds to numpy arrays
     for i in range(len(BOUNDS)):
         for j in range(len(BOUNDS[i])):
             BOUNDS[i][j] = np.array(BOUNDS[i][j])
 
-def get_binary(frame, crop, bounds):
+    return BOUNDS[:]
+
+def apply_filters(frame):
     # do a blur and convert colour space
-    frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE))
+    frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE), normalize=True)
     frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-    # threshold images
-    thresh = cv.inRange(frame, *BOUNDS[0])
+    return frame
 
+def get_binary(frame, index, bounds=None, crop=None):
+    # use default bounds if not specified
+    if bounds is None:
+        bounds = BOUNDS
+
+    # apply filters to image and convert colour space
+    apply_filters(frame)
+
+    # threshold images
+    thresh = cv.inRange(frame, *bounds[index])
 #       frame[CROP[0][0][1]:CROP[0][1][1], CROP[0][0][0]:CROP[0][1][0]],
 
     return thresh

@@ -11,6 +11,11 @@ RIGHT_BRACKET = 1048669
 LEFT_BRACKET = 1048667
 
 KEY_Q = 1048689
+KEY_S = 1048691
+
+KEY_1 = 1048625
+KEY_2 = 1048626
+KEY_3 = 1048627
 
 INCREMENTS = {
     RIGHT_ARROW: 10,
@@ -45,12 +50,12 @@ image_index = 0
 
 # make window and attach callback
 cv2.namedWindow('main')
+cv2.namedWindow('thresh')
 cv2.setMouseCallback('main', handle_mouse)
+cv2.setMouseCallback('thresh', handle_mouse)
 
-samples = []
-bounds = [[0, 0, 0], [0, 0, 0]]
-
-load_binary()
+bounds = load_bounds()
+bounds_index = 0
 
 while True:
     print "frame: {0}".format(image_index)
@@ -62,6 +67,15 @@ while True:
 
     if key == KEY_Q:
         break
+    elif key == KEY_1:
+        print "Editing left track"
+        bounds_index = 0
+    elif key == KEY_2:
+        print "Editing right track"
+        bounds_index = 1
+    elif key == KEY_3:
+        print "Editing obstacle track"
+        bounds_index = 2
 
     inc = INCREMENTS.get(key)
     if inc == None:
@@ -70,20 +84,30 @@ while True:
     image_index += inc
     image_index %= num_images
 
-    if clicked == 1:
+    # expand if left click
+    if clicked == 1 or clicked == 2:
+        img = apply_filters(img)
         new_coord = list(img[coordinate[1]][coordinate[0]])
         print new_coord
-        samples.append(new_coord)
 
-        clicked = 0
-    elif clicked == 2:
-        if len(samples) > 1:
-            samples.pop()
+        if clicked == 1:
+            for i in range(len(bounds[bounds_index][0])):
+                if bounds[bounds_index][0][i] > new_coord[i]:
+                    bounds[bounds_index][0][i] = new_coord[i]
+            for i in range(len(bounds[bounds_index][1])):
+                if bounds[bounds_index][1][i] < new_coord[i]:
+                    bounds[bounds_index][1][i] = new_coord[i]
+        if clicked == 2:
+            for i in range(len(bounds[bounds_index][0])):
+                if bounds[bounds_index][0][i] < new_coord[i]:
+                    bounds[bounds_index][0][i] = new_coord[i]
+            for i in range(len(bounds[bounds_index][1])):
+                if bounds[bounds_index][1][i] > new_coord[i]:
+                    bounds[bounds_index][1][i] = new_coord[i]
 
-        clicked = 0
+        clicked = False
 
-
-    thresh = get_binary(img, 0, 0)
+    thresh = get_binary(img, bounds_index, bounds=bounds)
     cv2.imshow("thresh", thresh)
 
 cv2.destroyAllWindows()
