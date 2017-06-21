@@ -22,6 +22,7 @@ class Main(Thread):
         self.hardware = hi.HardwareInterface()
 
         path_id = 0
+        overwrite = -1
 
         while True:
             self.path = "/home/ubuntu/car/computer/images/" + path + str(path_id)
@@ -29,6 +30,13 @@ class Main(Thread):
                 mkdir(self.path)
                 break
             except OSError:
+                if overwrite == -1:
+                    char = raw_input("Already exists, overwite (y/n): ")
+                    if char == 'y' or char == 'Y':
+                        overwrite = True
+                    else:
+                        overwrite = False
+
                 path_id += 1
 
     def run(self):
