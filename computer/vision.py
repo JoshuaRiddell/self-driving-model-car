@@ -100,7 +100,10 @@ class VisionInterface(object):
     def save_frame(self, frame_id, path):
         """
         """
-        cv.imwrite(path + "/" + str(self.frame_index) + ".jpg", self.frames[frame_id]);
+        cv.imwrite(path +
+                "/" +
+                "{0:04d}".format(self.frame_index) +
+                ".jpg", self.frames[frame_id]);
 
         self.frame_index += 1
 

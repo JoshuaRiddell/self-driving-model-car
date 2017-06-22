@@ -6,6 +6,7 @@ from threading import Thread, Lock
 import server
 from time import sleep
 from os import mkdir
+from shutil import rmtree
 
 class Main(Thread):
     """Main control thread.
@@ -34,6 +35,8 @@ class Main(Thread):
                     char = raw_input("Already exists, overwite (y/n): ")
                     if char == 'y' or char == 'Y':
                         overwrite = True
+                        rmtree(self.path)
+                        break
                     else:
                         overwrite = False
 
@@ -47,14 +50,14 @@ class Main(Thread):
         frame_count = 0
 
         while True:
-            self.vision.read_raw_frame()
+            self.vision.read_frame()
 
             if self.hardware.get_state() == hi.MANUAL:
                 if not started:
                     print "Recording..."
                     started = True
 
-                self.vision.save_frame(0, self.path)
+                self.vision.save_frame(2, self.path)
                 frame_count += 1
             else:
                 if started:

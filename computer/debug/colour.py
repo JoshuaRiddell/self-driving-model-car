@@ -43,9 +43,9 @@ folder_name = raw_input("Image folder name: ")
 if len(folder_name) == 0:
     folder_name = "test0"
 
-path = "../images/" + folder_name
+path = "/home/ubuntu/car/computer/images/" + folder_name
 # termination criteria
-images = glob.glob(path + '/*.jpg')
+images = sorted(glob.glob(path + '/*.jpg'))
 num_images = len(images)
 image_index = 0
 
@@ -65,10 +65,6 @@ bounds_index = 0
 
 while True:
     key = cv2.waitKey(0)
-
-    print "frame: {0}".format(image_index)
-    img = cv2.imread(images[image_index])
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     if key == KEY_Q:
         break
@@ -106,6 +102,10 @@ while True:
     image_index += inc
     image_index %= num_images
 
+    img = cv2.imread(images[image_index])
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+
     # expand if left click
     if clicked == 1 or clicked == 2:
         if clicked == 1:
@@ -124,6 +124,8 @@ while True:
             bounds[bounds_index][1][i] = max(x[i] for x in samples[bounds_index])
 
         clicked = False
+
+    print "frame: {0}".format(image_index)
 
     thresh = get_binary(img, bounds_index, bounds=bounds)
     cv2.imshow("thresh", thresh)
