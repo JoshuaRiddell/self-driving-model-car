@@ -55,13 +55,11 @@ cv2.namedWindow('thresh')
 cv2.setMouseCallback('main', handle_mouse)
 cv2.setMouseCallback('thresh', handle_mouse)
 
-samples = [[], [], []]
+bounds, samples = load_bounds()
+bounds_index = 0
 
 minimum = [0, 0, 0]
 maximum = [255, 255, 255]
-bounds = [[minimum, maximum]] * 3
-bounds = [[np.array(x) for x in y] for y in bounds]
-bounds_index = 0
 
 while True:
     key = cv2.waitKey(0)

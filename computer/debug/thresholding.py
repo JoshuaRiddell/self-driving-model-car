@@ -20,12 +20,18 @@ def load_bounds():
     global BOUNDS
     global KERNEL_SIZE
 
+    samples = [[]] * 3
+    bounds = [[]] * 3
+
     # read arrays from file
     try:
         fd = open(THRESH_FILENAME, 'r')
 
         for i in range(len(BOUNDS)):
-            BOUNDS[i] = eval(fd.readline())
+            bounds[i] = eval(fd.readline())
+
+        for i in range(len(samples)):
+            samples[i] = eval(fd.readline())
 
         fd.close()
     except:
@@ -33,9 +39,13 @@ def load_bounds():
         raise
 
     # convert bounds to numpy arrays
+    BOUNDS = bounds[:][:]
     for i in range(len(BOUNDS)):
         for j in range(len(BOUNDS[i])):
             BOUNDS[i][j] = np.array(BOUNDS[i][j])
+            bounds[i][j] = np.array(bounds[i][j])
+
+    return (bounds, samples)
 
 def apply_filters(frame):
     # do a blur and convert colour space
