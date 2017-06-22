@@ -97,13 +97,6 @@ while True:
     if inc == None:
         inc = 0
 
-    image_index += inc
-    image_index %= num_images
-
-    img = cv2.imread(images[image_index])
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-
     # expand if left click
     if clicked == 1 or clicked == 2:
         if clicked == 1:
@@ -113,7 +106,8 @@ while True:
 
             samples[bounds_index].append(new_coord)
         elif clicked == 2:
-            if len(samples) > 0:
+            print "Sample popped, using {0} samples".format(len(samples[bounds_index]))
+            if len(samples[bounds_index]) > 0:
                 samples[bounds_index].pop()
 
         for i in range(len(bounds[bounds_index][0])):
@@ -122,6 +116,12 @@ while True:
             bounds[bounds_index][1][i] = max(x[i] for x in samples[bounds_index])
 
         clicked = False
+
+    image_index += inc
+    image_index %= num_images
+
+    img = cv2.imread(images[image_index])
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     print "frame: {0}".format(image_index)
 
