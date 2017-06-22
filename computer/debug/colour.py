@@ -12,6 +12,7 @@ LEFT_BRACKET = 1048667
 
 KEY_Q = 1048689
 KEY_S = 1048691
+KEY_N = 1048686
 
 KEY_1 = 1048625
 KEY_2 = 1048626
@@ -91,6 +92,12 @@ while True:
             fd.write(str(sample))
             fd.write("\n")
         fd.close()
+    elif key == KEY_N:
+        print "Resetting current sample..."
+        samples[bounds_index] = []
+        bounds[bounds_index] = [np.array(minimum[:]),
+                np.array(maximum[:])]
+        clicked = False
 
     inc = INCREMENTS.get(key)
     if inc == None:
@@ -122,14 +129,5 @@ while True:
     cv2.imshow("thresh", thresh)
     cv2.imshow('main', img)
 
-    print bounds
-
 cv2.destroyAllWindows()
-
-
-
-
-
-
-
 
