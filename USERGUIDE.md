@@ -25,6 +25,7 @@ Options:
 - i.e. ssh ubuntu@10.1.0.1
 - Repo is cloned in the symlink ~/car
 - Is connected to router via ethernet and has a wifi card. If you need internet on it you'll need to connect to eduroam via wifi card. nm-connection-editor starts network manager gui - that's how I did it.
+- Sometimes the jetson won't turn on when power is applied. There is an on button near the rear-right of the car on the jetson board.
 
 # Code
 
