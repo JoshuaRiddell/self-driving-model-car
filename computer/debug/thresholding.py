@@ -33,13 +33,9 @@ def load_bounds():
         raise
 
     # convert bounds to numpy arrays
-    retval = BOUNDS[:]
     for i in range(len(BOUNDS)):
         for j in range(len(BOUNDS[i])):
             BOUNDS[i][j] = np.array(BOUNDS[i][j])
-            retval[i][j] = np.array(BOUNDS[i][j][:])
-
-    return retval
 
 def apply_filters(frame):
     # do a blur and convert colour space
