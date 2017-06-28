@@ -4,19 +4,38 @@ import numpy as np
 import cv2
 import glob
 from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME
+import getpass
 
-RIGHT_ARROW = 1113939
-LEFT_ARROW = 1113937
-RIGHT_BRACKET = 1048669
-LEFT_BRACKET = 1048667
+user = getpass.getuser()
 
-KEY_Q = 1048689
-KEY_S = 1048691
-KEY_N = 1048686
+if user == "ubuntu":
+    RIGHT_ARROW = 1113939
+    LEFT_ARROW = 1113937
+    RIGHT_BRACKET = 1048669
+    LEFT_BRACKET = 1048667
 
-KEY_1 = 1048625
-KEY_2 = 1048626
-KEY_3 = 1048627
+    KEY_Q = 1048689
+    KEY_S = 1048691
+    KEY_N = 1048686
+
+    KEY_1 = 1048625
+    KEY_2 = 1048626
+    KEY_3 = 1048627
+elif user == "josh":
+    RIGHT_ARROW = 65363
+    LEFT_ARROW = 65361
+    RIGHT_BRACKET = 93
+    LEFT_BRACKET = 91
+
+    KEY_Q = 113
+    KEY_S = 115
+    KEY_N = 110
+
+    KEY_1 = 49
+    KEY_2 = 50
+    KEY_3 = 51
+else:
+    raise Exception("No user registered")
 
 INCREMENTS = {
     RIGHT_ARROW: 10,
@@ -43,7 +62,7 @@ folder_name = raw_input("Image folder name: ")
 if len(folder_name) == 0:
     folder_name = "test0"
 
-path = "/home/ubuntu/car/computer/images/" + folder_name
+path = "/home/" + user + "/car/computer/images/" + folder_name
 # termination criteria
 images = sorted(glob.glob(path + '/*.jpg'))
 num_images = len(images)

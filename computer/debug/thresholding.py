@@ -1,6 +1,9 @@
 # shared file between debug and main program to get binary image
 import cv2 as cv
 import numpy as np
+import getpass
+
+user = getpass.getuser()
 
 # crops to isolate different colours
 #CROP = [
@@ -8,7 +11,7 @@ import numpy as np
 #    [[0, 0], [100, 100]], # blue crop
 #]
 
-THRESH_FILENAME = "/home/ubuntu/car/computer/debug/thresholds.txt"
+THRESH_FILENAME = "/home/" + user + "/car/computer/debug/thresholds.txt"
 
 # bounds of colours (hsv) values (left track, right track, obstacle)
 BOUNDS = [None] * 3
