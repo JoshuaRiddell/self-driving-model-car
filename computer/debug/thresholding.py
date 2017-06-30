@@ -17,7 +17,12 @@ THRESH_FILENAME = "/home/" + user + "/car/computer/debug/thresholds.txt"
 BOUNDS = [None] * 3
 
 # kernel size for blur filter
-KERNEL_SIZE = 5
+KERNEL_SIZE = 2
+KERNEL = np.ones((KERNEL_SIZE, KERNEL_SIZE), np.uint8)
+
+# kernel size to downsample at the end
+DOWNSAMPLE_SIZE = 10
+SUM_THRESHOLD = (DOWNSAMPLE_SIZE**2) * 255 * 0.5
 
 def load_bounds():
     global BOUNDS
@@ -69,4 +74,29 @@ def get_binary(frame, index, bounds=None, crop=None):
     thresh = cv.inRange(frame, *bounds[index])
 #       frame[CROP[0][0][1]:CROP[0][1][1], CROP[0][0][0]:CROP[0][1][0]],
 
+
     return thresh
+
+def apply_morph(frame):
+
+    frame = cv.erode(frame, KERNEL, iterations = 1)
+
+    return frame
+
+def downsample(frame):
+    width = frame.shape[0] / DOWNSAMPLE_SIZE - 1
+    height = frame.shape[1] / DOWNSAMPLE_SIZE - 1
+
+    matrix = np.array([[0] * height] * width, np.uint8)
+
+    for i in range(width):
+        for j in range(height):
+            mat_sum = np.sum(frame[
+                i*DOWNSAMPLE_SIZE:(i+1)*DOWNSAMPLE_SIZE,
+                j*DOWNSAMPLE_SIZE:(j+1)*DOWNSAMPLE_SIZE])
+            if mat_sum > 0:
+                matrix[i][j] = 254
+            else:
+                matrix[i][j] = 0
+
+    return matrix, frame

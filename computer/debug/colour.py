@@ -3,7 +3,7 @@
 import numpy as np
 import cv2
 import glob
-from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME
+from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME, apply_morph, downsample
 import getpass
 
 user = getpass.getuser()
@@ -30,6 +30,7 @@ elif user == "josh":
     KEY_Q = 113
     KEY_S = 115
     KEY_N = 110
+    KEY_M = 109
 
     KEY_1 = 49
     KEY_2 = 50
@@ -80,6 +81,8 @@ bounds_index = 0
 minimum = [0, 0, 0]
 maximum = [255, 255, 255]
 
+do_morph = True
+
 while True:
     key = cv2.waitKey(0)
 
@@ -111,6 +114,11 @@ while True:
         bounds[bounds_index] = [np.array(minimum[:]),
                 np.array(maximum[:])]
         clicked = False
+    elif key == KEY_M:
+        print "Toggling morph..."
+        do_morph = not do_morph
+
+    print key
 
     inc = INCREMENTS.get(key)
     if inc == None:
@@ -145,8 +153,14 @@ while True:
     print "frame: {0}".format(image_index)
 
     thresh = get_binary(img, bounds_index, bounds=bounds)
+    if do_morph:
+        thresh = apply_morph(thresh)
+
+    matrix, thresh = downsample(thresh)
+
     cv2.imshow("thresh", thresh)
     cv2.imshow('main', img)
+    cv2.imshow('mat', matrix)
 
 cv2.destroyAllWindows()
 
