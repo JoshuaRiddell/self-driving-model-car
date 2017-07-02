@@ -3,7 +3,7 @@
 import numpy as np
 import cv2
 import glob
-from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME, apply_morph, downsample
+from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME, apply_morph, downsample, generate_direction
 import getpass
 
 user = getpass.getuser()
@@ -148,19 +148,19 @@ while True:
     image_index %= num_images
 
     img = cv2.imread(images[image_index])
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     print "frame: {0}".format(image_index)
 
-    thresh = get_binary(img, bounds_index, bounds=bounds)
+    threshs = get_binary(img, bounds=bounds)
     if do_morph:
-        thresh = apply_morph(thresh)
+        threshs = apply_morph(threshs)
 
-    matrix, thresh = downsample(thresh)
+    matrices = downsample(threshs)
+    generate_direction(matrices)
 
-    cv2.imshow("thresh", thresh)
+    cv2.imshow("thresh", threshs[bounds_index])
     cv2.imshow('main', img)
-    cv2.imshow('mat', matrix)
+    cv2.imshow('mat', matrices[bounds_index])
 
 cv2.destroyAllWindows()
 

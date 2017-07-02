@@ -14,7 +14,8 @@ user = getpass.getuser()
 THRESH_FILENAME = "/home/" + user + "/car/computer/debug/thresholds.txt"
 
 # bounds of colours (hsv) values (left track, right track, obstacle)
-BOUNDS = [None] * 3
+NUM_BOUNDS = 3
+BOUNDS = [None] * NUM_BOUNDS
 
 # kernel size for blur filter
 KERNEL_SIZE = 2
@@ -59,44 +60,47 @@ def apply_filters(frame):
     # do a blur and convert colour space
     # frame = cv.boxFilter(frame, -1, (KERNEL_SIZE, KERNEL_SIZE), normalize=True)
     frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-
     return frame
 
-def get_binary(frame, index, bounds=None, crop=None):
+def get_binary(frame, index=None, bounds=None, crop=None):
     # use default bounds if not specified
-    #if bounds is None:
-    #    bounds = BOUNDS
+    if bounds is None:
+        bounds = BOUNDS
 
     # apply filters to image and convert colour space
-    frame = apply_filters(frame)
+    new_frame = apply_filters(frame)
 
     # threshold images
-    thresh = cv.inRange(frame, *bounds[index])
-#       frame[CROP[0][0][1]:CROP[0][1][1], CROP[0][0][0]:CROP[0][1][0]],
+    threshs = []
+    for bound in bounds:
+        threshs.append(cv.inRange(new_frame, *bound))
+#           frame[CROP[0][0][1]:CROP[0][1][1], CROP[0][0][0]:CROP[0][1][0]],
 
+    return threshs
 
-    return thresh
+def apply_morph(threshs):
+    for i in range(len(threshs)):
+        threshs[i] = cv.erode(threshs[i], KERNEL, iterations = 1)
+    return threshs
 
-def apply_morph(frame):
+def downsample(threshs):
+    width = threshs[0].shape[0] / DOWNSAMPLE_SIZE - 1
+    height = threshs[0].shape[1] / DOWNSAMPLE_SIZE - 1
 
-    frame = cv.erode(frame, KERNEL, iterations = 1)
+    unit = [[0] * height] * width
+    matrices = [unit] * NUM_BOUNDS
+    for i in range(len(matrices)):
+        matrices[i] = np.array(matrices[i], np.uint8)
 
-    return frame
+    for i in range(len(matrices)):
+        for j in range(width):
+            for k in range(height):
+                matrices[i][j][k] = np.sum(threshs[i][
+                    j*DOWNSAMPLE_SIZE:(j+1)*DOWNSAMPLE_SIZE,
+                    k*DOWNSAMPLE_SIZE:(k+1)*DOWNSAMPLE_SIZE])
 
-def downsample(frame):
-    width = frame.shape[0] / DOWNSAMPLE_SIZE - 1
-    height = frame.shape[1] / DOWNSAMPLE_SIZE - 1
+    return matrices
 
-    matrix = np.array([[0] * height] * width, np.uint8)
+def generate_direction(matrices):
+    pass
 
-    for i in range(width):
-        for j in range(height):
-            mat_sum = np.sum(frame[
-                i*DOWNSAMPLE_SIZE:(i+1)*DOWNSAMPLE_SIZE,
-                j*DOWNSAMPLE_SIZE:(j+1)*DOWNSAMPLE_SIZE])
-            if mat_sum > 0:
-                matrix[i][j] = 254
-            else:
-                matrix[i][j] = 0
-
-    return matrix, frame
