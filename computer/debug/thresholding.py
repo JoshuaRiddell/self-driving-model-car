@@ -22,7 +22,8 @@ KERNEL_SIZE = 2
 KERNEL = np.ones((KERNEL_SIZE, KERNEL_SIZE), np.uint8)
 
 # kernel size to downsample at the end
-DOWNSAMPLE_SIZE = 10
+DOWNSAMPLE_SIZE = 15
+SUM_SCALE = DOWNSAMPLE_SIZE**2
 SUM_THRESHOLD = (DOWNSAMPLE_SIZE**2) * 255 * 0.5
 
 def load_bounds():
@@ -97,10 +98,40 @@ def downsample(threshs):
             for k in range(height):
                 matrices[i][j][k] = np.sum(threshs[i][
                     j*DOWNSAMPLE_SIZE:(j+1)*DOWNSAMPLE_SIZE,
-                    k*DOWNSAMPLE_SIZE:(k+1)*DOWNSAMPLE_SIZE])
+                    k*DOWNSAMPLE_SIZE:(k+1)*DOWNSAMPLE_SIZE]) \
+                    / SUM_SCALE
 
+    print threshs[0].shape
     return matrices
 
+DISTANCE_SCALE = 1
+INTENSITY_SCALE = 1 / float(254)
+CALC_THRESHOLD = 30
+
+def get_vector(matrix):
+    width = matrix.shape[0]
+    height = matrix.shape[1]
+
+    pos = (width/2, 0)
+    vect = [0, 0]
+
+    for i in range(width):
+        for j in range(height):
+            if matrix[i][j] > CALC_THRESHOLD:
+                x_diff = j - pos[0]
+                y_diff = i - pos[1]
+
+                dist = abs(x_diff) + abs(y_diff)
+
+                scale = DISTANCE_SCALE / float(dist) * \
+                        matrix[i][j] * INTENSITY_SCALE
+
+                vect[0] += x_diff * scale
+                vect[1] += y_diff * scale
+                print "coord ({0}, {1}) ({2}, {3}) - {4} - {5}".format(i, j, x_diff, y_diff, matrix[i][j], scale)
+
+    print vect
+
 def generate_direction(matrices):
-    pass
+    get_vector(matrices[0])
 
