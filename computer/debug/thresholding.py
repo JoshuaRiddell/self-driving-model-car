@@ -139,15 +139,19 @@ def generate_direction(position, matrices):
     right = get_vector(position, matrices[1])
     obstacle = get_vector(position, matrices[2])
 
-    vect = left
 
     vectors = [left, right]
 
     angles = [pi - atan2(x[1], x[0]) for x in vectors]
+    mags = [sqrt(x[0]**2 + x[1]**2) for x in vectors]
 
     angles[0] = angles[0] + 2*pi/12
+    mags[1] = 0
 
-    mag = sqrt(vect[0]**2 + vect[1]**2)
+    comb_mags = sum(mags)
+    if comb_mags == 0:
+        return (0, 0)
 
-    return (angles[0], mag)
+    comb_angle = sum([x * y for x, y in zip(angles, mags)]) / comb_mags
+    return (comb_angle, comb_mags)
 
