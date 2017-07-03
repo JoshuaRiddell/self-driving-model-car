@@ -3,20 +3,41 @@
 import numpy as np
 import cv2
 import glob
-from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME
+from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME, apply_morph, downsample, generate_direction
+import getpass
+from math import cos, sin
 
-RIGHT_ARROW = 1113939
-LEFT_ARROW = 1113937
-RIGHT_BRACKET = 1048669
-LEFT_BRACKET = 1048667
+user = getpass.getuser()
 
-KEY_Q = 1048689
-KEY_S = 1048691
-KEY_N = 1048686
+if user == "ubuntu":
+    RIGHT_ARROW = 1113939
+    LEFT_ARROW = 1113937
+    RIGHT_BRACKET = 1048669
+    LEFT_BRACKET = 1048667
 
-KEY_1 = 1048625
-KEY_2 = 1048626
-KEY_3 = 1048627
+    KEY_Q = 1048689
+    KEY_S = 1048691
+    KEY_N = 1048686
+
+    KEY_1 = 1048625
+    KEY_2 = 1048626
+    KEY_3 = 1048627
+elif user == "josh":
+    RIGHT_ARROW = 65363
+    LEFT_ARROW = 65361
+    RIGHT_BRACKET = 93
+    LEFT_BRACKET = 91
+
+    KEY_Q = 113
+    KEY_S = 115
+    KEY_N = 110
+    KEY_M = 109
+
+    KEY_1 = 49
+    KEY_2 = 50
+    KEY_3 = 51
+else:
+    raise Exception("No user registered")
 
 INCREMENTS = {
     RIGHT_ARROW: 10,
@@ -43,7 +64,7 @@ folder_name = raw_input("Image folder name: ")
 if len(folder_name) == 0:
     folder_name = "test0"
 
-path = "/home/ubuntu/car/computer/images/" + folder_name
+path = "/home/" + user + "/car/computer/images/" + folder_name
 # termination criteria
 images = sorted(glob.glob(path + '/*.jpg'))
 num_images = len(images)
@@ -60,6 +81,8 @@ bounds_index = 0
 
 minimum = [0, 0, 0]
 maximum = [255, 255, 255]
+
+do_morph = True
 
 while True:
     key = cv2.waitKey(0)
@@ -92,6 +115,9 @@ while True:
         bounds[bounds_index] = [np.array(minimum[:]),
                 np.array(maximum[:])]
         clicked = False
+    elif key == KEY_M:
+        print "Toggling morph..."
+        do_morph = not do_morph
 
     inc = INCREMENTS.get(key)
     if inc == None:
@@ -121,13 +147,33 @@ while True:
     image_index %= num_images
 
     img = cv2.imread(images[image_index])
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     print "frame: {0}".format(image_index)
 
-    thresh = get_binary(img, bounds_index, bounds=bounds)
-    cv2.imshow("thresh", thresh)
+    threshs = get_binary(img, bounds=bounds)
+    if do_morph:
+        threshs = apply_morph(threshs)
+
+    matrices = downsample(threshs)
+
+    position = (threshs[0].shape[1]/2, threshs[0].shape[0])
+    vect = [0, 0]
+
+    (comb, debug) = generate_direction([matrices[0].shape[0]/2, 0], matrices)
+
+    angle = comb[0]
+    mag = comb[1]
+
+    print ">> {0} {1}".format(angle, mag)
+
+    start_point = tuple([int(x) for x in position])
+    end_point = (start_point[0] - int(100 * cos(angle)), start_point[1] - int(100 * sin(angle)))
+
+    cv2.line(img, start_point, end_point, (0, 255, 0), 2)
+
+    cv2.imshow("thresh", threshs[bounds_index])
     cv2.imshow('main', img)
+    cv2.imshow('mat', matrices[bounds_index])
 
 cv2.destroyAllWindows()
 
