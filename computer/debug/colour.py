@@ -159,7 +159,10 @@ while True:
     position = (threshs[0].shape[1]/2, threshs[0].shape[0])
     vect = [0, 0]
 
-    angle, mag = generate_direction([matrices[0].shape[0]/2, 0], matrices)
+    (comb, debug) = generate_direction([matrices[0].shape[0]/2, 0], matrices)
+
+    angle = comb[0]
+    mag = comb[1]
 
     print ">> {0} {1}".format(angle, mag)
 

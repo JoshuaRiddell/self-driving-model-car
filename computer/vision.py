@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 from threading import Lock
+from debug import thresholding as thr
 
 # turn
 # right, straight, left
@@ -119,17 +120,27 @@ class VisionInterface(object):
         """
         # get the current frame
         ret, frame = self.cam.read()
-        self.update_frame(0, frame)
-
-        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-
-        self.update_frame(1, gray)
 
         warped = cv.warpPerspective(frame, self.M, self.res)
-        self.update_frame(2, warped)
 
+        threshs = thr.get_binary(warped)
+        threshs = apply_morph(threshs)
 
-#
+        self.update_frame(1, threshs[0])
+
+        matrices = downsample(threshs)
+
+        (comb, debug) = generate_direction([matrices[0].shape[0]/2, 0], matrices)
+
+        angle = comb[0]
+        mag = comb[1]
+
+        start_point = tuple([int(x) for x in position])
+        end_point = (start_point[0] - int(100 * cos(angle)), start_point[1] - int(100 * sin(angle)))
+
+        cv2.line(warped, start_point, end_point, (0, 255, 0), 2)
+        self.update_frame(0, warped)
+
 #        contours, heirarchy = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 #
 #        rows, cols = thresh.shape[:2]

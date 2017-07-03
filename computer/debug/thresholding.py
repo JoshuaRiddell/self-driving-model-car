@@ -150,8 +150,8 @@ def generate_direction(position, matrices):
 
     comb_mags = sum(mags)
     if comb_mags == 0:
-        return (0, 0)
+        return ((0, 0), (0, 0))
 
     comb_angle = sum([x * y for x, y in zip(angles, mags)]) / comb_mags
-    return (comb_angle, comb_mags)
+    return ((comb_angle, comb_mags), (angles, mags))
 
