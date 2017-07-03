@@ -5,6 +5,7 @@ import cv2
 import glob
 from thresholding import load_bounds, apply_filters, get_binary, THRESH_FILENAME, apply_morph, downsample, generate_direction
 import getpass
+from math import cos, sin
 
 user = getpass.getuser()
 
@@ -118,8 +119,6 @@ while True:
         print "Toggling morph..."
         do_morph = not do_morph
 
-    print key
-
     inc = INCREMENTS.get(key)
     if inc == None:
         inc = 0
@@ -156,7 +155,18 @@ while True:
         threshs = apply_morph(threshs)
 
     matrices = downsample(threshs)
-    generate_direction(matrices)
+
+    position = (threshs[0].shape[1]/2, threshs[0].shape[0])
+    vect = [0, 0]
+
+    angle, mag = generate_direction([matrices[0].shape[0]/2, 0], matrices)
+
+    print ">> {0} {1}".format(angle, mag)
+
+    start_point = tuple([int(x) for x in position])
+    end_point = (start_point[0] - int(100 * cos(angle)), start_point[1] - int(100 * sin(angle)))
+
+    cv2.line(img, start_point, end_point, (0, 255, 0), 2)
 
     cv2.imshow("thresh", threshs[bounds_index])
     cv2.imshow('main', img)

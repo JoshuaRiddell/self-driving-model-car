@@ -2,6 +2,7 @@
 import cv2 as cv
 import numpy as np
 import getpass
+from math import atan2, sqrt, pi
 
 user = getpass.getuser()
 
@@ -101,18 +102,16 @@ def downsample(threshs):
                     k*DOWNSAMPLE_SIZE:(k+1)*DOWNSAMPLE_SIZE]) \
                     / SUM_SCALE
 
-    print threshs[0].shape
     return matrices
 
 DISTANCE_SCALE = 1
 INTENSITY_SCALE = 1 / float(254)
 CALC_THRESHOLD = 30
 
-def get_vector(matrix):
+def get_vector(pos, matrix):
     width = matrix.shape[0]
     height = matrix.shape[1]
 
-    pos = (width/2, 0)
     vect = [0, 0]
 
     for i in range(width):
@@ -123,15 +122,32 @@ def get_vector(matrix):
 
                 dist = abs(x_diff) + abs(y_diff)
 
+                if dist == 0:
+                    continue
+
                 scale = DISTANCE_SCALE / float(dist) * \
                         matrix[i][j] * INTENSITY_SCALE
 
                 vect[0] += x_diff * scale
                 vect[1] += y_diff * scale
-                print "coord ({0}, {1}) ({2}, {3}) - {4} - {5}".format(i, j, x_diff, y_diff, matrix[i][j], scale)
+                # print "coord ({0}, {1}) ({2}, {3}) - {4} - {5}".format(i, j, x_diff, y_diff, matrix[i][j], scale)
 
-    print vect
+    return np.array(vect, np.float)
 
-def generate_direction(matrices):
-    get_vector(matrices[0])
+def generate_direction(position, matrices):
+    left = get_vector(position, matrices[0])
+    right = get_vector(position, matrices[1])
+    obstacle = get_vector(position, matrices[2])
+
+    vect = left
+
+    vectors = [left, right]
+
+    angles = [pi - atan2(x[1], x[0]) for x in vectors]
+
+    angles[0] = angles[0] + 2*pi/12
+
+    mag = sqrt(vect[0]**2 + vect[1]**2)
+
+    return (angles[0], mag)
 
