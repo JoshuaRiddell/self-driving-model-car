@@ -28,8 +28,9 @@ class Main(Thread):
 
         while True:
             if self.hardware.get_state() == hi.AUTO:
-                self.vision.read_frame()
-                print "frame processed"
+                angle = self.vision.read_frame()
+                self.hardware.add_to_pwm_queue(hi.SERVO, angle*60)
+                print "frame processed {}".format(angle)
 
 if __name__ == "__main__":
     # make the main thread and start it
