@@ -18,6 +18,7 @@ if user == "ubuntu":
     KEY_Q = 1048689
     KEY_S = 1048691
     KEY_N = 1048686
+    KEY_M = 0
 
     KEY_1 = 1048625
     KEY_2 = 1048626
@@ -135,6 +136,9 @@ while True:
             print "Sample popped, using {0} samples".format(len(samples[bounds_index]))
             if len(samples[bounds_index]) > 0:
                 samples[bounds_index].pop()
+
+        if len(samples[bounds_index]) == 0:
+            continue
 
         for i in range(len(bounds[bounds_index][0])):
             bounds[bounds_index][0][i] = min(x[i] for x in samples[bounds_index])
