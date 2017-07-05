@@ -26,7 +26,7 @@ class Main(Thread):
     def run(self):
         """Main control loop.
         """
-        ON = 6
+        ON = 8
         OFF = 5
 
         while True:
