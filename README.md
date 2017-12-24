@@ -49,7 +49,7 @@ Here lies the main repository for resources concerning our entry to the QUT DRC.
 - [ ] 4x LED array output
 - [ ] 1x piezo buzzer output
 - [ ] Power switching from battery to wall power (allows servo to work off wall power)
-- [ ] 1x ultrasonic sensor input
+- [ ] 3-5x ultrasonic sensor input
 
 ## Power Distribution PCB
 
@@ -60,10 +60,11 @@ Here lies the main repository for resources concerning our entry to the QUT DRC.
 - [ ] 2x battery voltage/current indicators
 - [ ] 2x XT60 sensetive electronics output (~4A) + alternative connectors
 - [ ] 1x XT60 high power electronics output (~30A) + alternative connectors
+- [ ] 1x charge, wall power, indicator LEDs
 
 ## Pogo Pin PCB
 
-- [ ] Stepped pogo pin array
+- [ ] Pogo pin array
 - [ ] High current output ~10A
-- [ ] 3 wire interface to power distribution board
+- [ ] 2 wire interface to power board
 - [ ] Holes to mount magnets
