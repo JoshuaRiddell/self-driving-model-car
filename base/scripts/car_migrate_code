@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# migrates code to remote machine and runs compilation script
+
+source ../../config.txt
+
+rsync -avz --delete $BASE_PROJECT_DIR/ $CAR_REMOTE_PROJECT_ADDRESS
+ssh $CAR_REMOTE_PROJECT_ADDRESS $CAR_PROJECT_DIR/car/scripts/migrate_code.sh

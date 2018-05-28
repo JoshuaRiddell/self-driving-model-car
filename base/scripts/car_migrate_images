@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# copies images from the remote car filder
+
+source ../../config.txt
+
+rsync -avz --delete $CAR_USR@$CAR_ADDRESS:$CAR_TEST_IMAGES_DIR $BASE_TEST_IMAGES_DIR
+

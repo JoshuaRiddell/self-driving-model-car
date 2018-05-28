@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# compiles the arduino code and uploads to the hardware
+
+source ../../config.txt
+
+sudo arduino --upload --board arduino:avr:uno --port $ARDUINO_PORT $CAR_PROJECT_DIR/car/hardware/hardware.ino
