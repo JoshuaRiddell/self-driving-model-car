@@ -41,30 +41,19 @@ Here lies the main repository for resources concerning our entry to the QUT DRC.
 # PCBs
 ## Low Level Electronics PCB
 
-- [ ] 32-bit microcontroller
-- [ ] FTDI chip
-- [ ] ISP header
-- [ ] 2x PWM output
-- [ ] 2x PWM input
-- [ ] 4x LED array output
-- [ ] 1x piezo buzzer output
-- [ ] Power switching from battery to wall power (allows servo to work off wall power)
-- [ ] 3-5x ultrasonic sensor input
+- [x] 2x PWM output
+- [x] 2x PWM input
+- [x] 4x LED array output
+- [x] 1x piezo buzzer output
+- [x] Power switching from battery to wall power (allows servo to work off wall power)
+- [ ] 3-5x ultrasonic sensor input  --- changed to 1x ultrasonic sensor input
 
 ## Power Distribution PCB
 
-- [ ] Relays for switching between battery and wall power
-- [ ] Smoothing capacitors for switching noise
-- [ ] 2x battery charger
-- [ ] 2x battery balancer
-- [ ] 2x battery voltage/current indicators
-- [ ] 2x XT60 sensetive electronics output (~4A) + alternative connectors
-- [ ] 1x XT60 high power electronics output (~30A) + alternative connectors
-- [ ] 1x charge, wall power, indicator LEDs
+- [x] Relays for switching between battery and wall power
+- [x] 2x battery voltage/current indicators
+- [x] 2x XT60 sensetive electronics output (~4A) + alternative connectors
+- [x] 1x XT60 high power electronics output (~30A) + alternative connectors
+- [x] 1x charge, wall power
+- [ ] 4x power indicator LEDs
 
-## Pogo Pin PCB
-
-- [ ] Pogo pin array
-- [ ] High current output ~10A
-- [ ] 2 wire interface to power board
-- [ ] Holes to mount magnets
