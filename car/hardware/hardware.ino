@@ -9,7 +9,6 @@
 
 // TODO
 // add proper tones
-// add status LEDs
 // arg checking on serial input
 
 // define pin arrays
@@ -18,6 +17,7 @@ Servo output_pins[NUM_CHANNELS];
 // define incoming bytes buffer
 byte incomingBuffer[BUFFER_SIZE];
 
+// define flow control states
 void wait_for_arm(void);
 void wait_for_start(void);
 void reset_outputs(void);
@@ -26,15 +26,13 @@ void manual_control(void);
 // setup peripherals
 void setup() {
   // status light pins
-  setup_lights();
+  state_lights_init();
 
   // rc receiver pwm input
-  setup_receiver();
+  receiver_init();
 
-#ifdef ENABLE_BUZZER
   // status buzzer
-  setup_buzzer();
-#endif
+  buzzer_init();
 
   // start serial
 #ifdef ENABLE_DEBUG
@@ -103,8 +101,8 @@ void loop() {
 // for 2 seconds then to be released before it progresses
 void wait_for_arm() {
   // set white light
-  clear_all_lights();
-  set_light(WHITE);
+  state_lights_clear_all();
+  state_lights_set(WHITE);
 
   // wait for the trigger to be pressed for more than 2 seconds
   uint8_t timer_counter = 0;
@@ -114,25 +112,25 @@ void wait_for_arm() {
       timer_counter += 1;
       if (timer_counter == 1) {
         // if trigger was only just pulled then set a light and play sound
-        set_light(BLUE);
-        play_sound(SOUND_LOW);
+        state_lights_set(BLUE);
+        buzzer_play_sound(SOUND_LOW);
       } else if (timer_counter > ARM_CUTOFF / 50) {
         // if we exceeded time about then continue
         break;
       }
     } else {
       // if trigger was released then reset counter and clear blue light
-      clear_light(BLUE);
+      state_lights_clear(BLUE);
       timer_counter = 0;
     }
     delay(50);
   }
 
   // set red armed light and play a sound
-  set_light(RED);
-  play_sound(SOUND_HIGH);
+  state_lights_set(RED);
+  buzzer_play_sound(SOUND_HIGH);
   delay(100);
-  play_sound(SOUND_HIGH);
+  buzzer_play_sound(SOUND_HIGH);
 
   // wait for trigger to be released
   while (get_pwm(THROT_ID) > STARTUP_THRESH) {
@@ -140,10 +138,10 @@ void wait_for_arm() {
   }
 
   // play a and set leds to armed mode state
-  play_sound(SOUND_LOW);
-  set_light(GREEN);
-  clear_light(BLUE);
-  clear_light(RED);
+  buzzer_play_sound(SOUND_LOW);
+  state_lights_set(GREEN);
+  state_lights_clear(BLUE);
+  state_lights_clear(RED);
   // currently lit: white + green
   delay(100);
 }
@@ -151,9 +149,9 @@ void wait_for_arm() {
 // sequence for starting. Waits for the remote trigger to be pressed.
 void wait_for_start() {
   // set lights to armed state
-  clear_all_lights();
-  set_light(WHITE);
-  set_light(GREEN);
+  state_lights_clear_all();
+  state_lights_set(WHITE);
+  state_lights_set(GREEN);
 
   // wait for trigger to be pressed
   while (get_pwm(THROT_ID) < STARTUP_THRESH) {
@@ -161,8 +159,8 @@ void wait_for_start() {
   }
 
   // play a sound and set to auto mode lights
-  play_sound(SOUND_HIGH);
-  clear_light(WHITE);
+  buzzer_play_sound(SOUND_HIGH);
+  state_lights_clear(WHITE);
   // currently lit: green
 }
 
@@ -172,10 +170,10 @@ void manual_control() {
   reset_outputs();
 
   // set lights to manual control
-  clear_all_lights();
-  set_light(BLUE);
-  set_light(GREEN);
-  play_sound(SOUND_HIGH);
+  state_lights_clear_all();
+  state_lights_set(BLUE);
+  state_lights_set(GREEN);
+  buzzer_play_sound(SOUND_HIGH);
 
   // delay to allow user to remove finger from brake to prevent a reverse
   delay(1000);
@@ -195,7 +193,7 @@ void manual_control() {
       if (timer_counter > MANUAL_CUTOFF / MANUAL_DELAY) {
         // if we were in the above conditions for enough time then
         // exit manual mode
-        play_sound(SOUND_HIGH);
+        buzzer_play_sound(SOUND_HIGH);
         break;
       }
     } else {

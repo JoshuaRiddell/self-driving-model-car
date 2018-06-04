@@ -7,7 +7,7 @@
 #define ENABLE_DEBUG  // enables debug messages
 #define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
 // #define SONAR  // enables sonar ranging
-#define ENABLE_BUZZER  // turns the piezo off for quiet debugging mode
+#define BUZZER_DISABLE // disables the buzzer for quiet mode
 
 // serial paramters
 #define SERIAL_BAUD 115200

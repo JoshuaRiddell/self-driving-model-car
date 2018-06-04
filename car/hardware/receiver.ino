@@ -9,7 +9,7 @@ void handle_servo_intr();
 void handle_throt_intr();
 void handle_interrupt(uint8_t pin_id, bool change);
 
-void setup_receiver() {
+void receiver_init() {
   // reciever pin modes
   pinMode(SERVO_RX, INPUT);
   pinMode(THROT_RX, INPUT);

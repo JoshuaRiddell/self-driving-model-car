@@ -9,8 +9,13 @@
 // green only: car is armed and in autonomous mode, reading from serial input
 // green + blue: car is armed and in manual mode, reading from the radio receiver
 
-#define NUM_LIGHTS 4
 
-const byte lights[] = { WHITE, BLUE, GREEN, RED };
+void state_lights_init();
+void state_lights_strum();
+void state_lights_set(int pin);
+void state_lights_clear(int pin);
+void state_lights_clear_all();
+void state_lights_toggle(int pin);
 
 #endif  // STATE_LIGHTS_
+
