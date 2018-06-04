@@ -7,4 +7,4 @@ source $DIR/../../config.txt
 
 rsync -avz --delete $BASE_PROJECT_DIR/ $CAR_REMOTE_PROJECT_ADDRESS
 
-ssh $CAR_REMOTE_ADDRESS $CAR_PROJECT_DIR/car/scripts/car_recompile
+ssh $CAR_REMOTE_ADDRESS $CAR_PROJECT_DIR/car/scripts/car_arduino_upload

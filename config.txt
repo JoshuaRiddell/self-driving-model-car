@@ -1,10 +1,25 @@
-CAR_ADDRESS="192.168.0.11"
-CAR_PROJECT_DIR="/home/ubuntu/car"
+# car addresses
+CAR_ADDRESS="10.0.0.149"
 CAR_USR="ubuntu"
+
+# car directories of interest
+CAR_PROJECT_DIR="/home/ubuntu/rsync_car"
 CAR_TEST_IMAGES_DIR="/home/ubuntu/test_images"
-CAR_REMOTE_PROJECT_ADDRESS="$CAR_USR@$CAR_ADDRESS:$CAR_PROJECT_DIR"
+
+# car arduino directories
 CAR_ARDUINO_PORT="/dev/ttyACM0"
 CAR_ARDUINO_BAUD="115200"
 
+# base station directories
 BASE_PROJECT_DIR="/home/josh/self-driving-model-car"
 BASE_TEST_IMAGES_DIR="/home/josh/test_images"
+
+
+
+
+
+# AUTOGEN
+
+# car remote addressess and project directory
+CAR_REMOTE_ADDRESS="$CAR_USR@$CAR_ADDRESS"
+CAR_REMOTE_PROJECT_ADDRESS="$CAR_REMOTE_ADDRESS:$CAR_PROJECT_DIR"
