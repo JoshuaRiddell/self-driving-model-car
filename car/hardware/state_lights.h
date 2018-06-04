@@ -1,12 +1,6 @@
 #ifndef STATE_LIGHTS_
 #define STATE_LIGHTS_
 
-// define pins
-#define WHITE 14  // on when car is in blocked flow waiting for user input
-#define BLUE 15
-#define GREEN 16  // car is currently armed and can move at any time
-#define RED 17
-
 // COMBINATIONS
 // white only: car is disarmed and waiting for arming by pulling the trigger back
 // white + blue: car is disarmed and indicating that the trigger is pulled

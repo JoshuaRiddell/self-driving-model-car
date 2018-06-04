@@ -31,7 +31,7 @@ void setup() {
   // rc receiver pwm input
   setup_receiver();
 
-#ifdef BUZZER
+#ifdef ENABLE_BUZZER
   // status buzzer
   setup_buzzer();
 #endif

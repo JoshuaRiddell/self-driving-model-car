@@ -7,14 +7,14 @@
 #define ENABLE_DEBUG  // enables debug messages
 #define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
 // #define SONAR  // enables sonar ranging
-#define BUZZER  // turns the piezo off for quiet debugging mode
+#define ENABLE_BUZZER  // turns the piezo off for quiet debugging mode
 
 // serial paramters
 #define SERIAL_BAUD 115200
 #define BUFFER_SIZE 2
 
 // buzzer parameters
-#define BUZZER_PIN 8
+#define BUZZER_PIN 14
 #define BUZZ_DURATION 10000
 #define SOUND_HIGH 100
 #define SOUND_MIDDLE 110
@@ -49,5 +49,8 @@
 #define SERIAL_AUTO '2'
 #define SERIAL_MANUAL '3'
 
-
-
+// define pins
+#define WHITE 4  // on when car is in blocked flow waiting for user input
+#define BLUE 5
+#define GREEN 6  // car is currently armed and can move at any time
+#define RED 7
