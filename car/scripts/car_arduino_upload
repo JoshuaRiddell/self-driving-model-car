@@ -2,6 +2,14 @@
 
 # compiles the arduino code and uploads to the hardware
 
-source ../../config.txt
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/../../config.txt
 
-sudo arduino --upload --board arduino:avr:uno --port $ARDUINO_PORT $CAR_PROJECT_DIR/car/hardware/hardware.ino
+# re-define echo to prepend with car_remote and colour green to indicate remoteness
+function echo {
+	builtin echo -e '\e[92mcar_remote: ' "$@" ;
+}
+
+echo "Uploading to arduino..."
+
+arduino --upload --board arduino:avr:uno --port $CAR_ARDUINO_PORT $CAR_PROJECT_DIR/car/hardware/hardware.ino

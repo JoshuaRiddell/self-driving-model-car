@@ -2,7 +2,8 @@
 
 # copies images from the remote car filder
 
-source ../../config.txt
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/../../config.txt
 
 rsync -avz --delete $CAR_USR@$CAR_ADDRESS:$CAR_TEST_IMAGES_DIR $BASE_TEST_IMAGES_DIR
 
