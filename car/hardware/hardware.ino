@@ -1,5 +1,4 @@
 #include <NewPing.h>
-#include <Servo.h>
 
 #include "config.h"
 #include "ranging.h"
@@ -10,9 +9,7 @@
 // TODO
 // add proper tones
 // arg checking on serial input
-
-// define pin arrays
-Servo output_pins[NUM_CHANNELS];
+// wall, cpu, tract voltage sensing
 
 // define incoming bytes buffer
 byte incomingBuffer[BUFFER_SIZE];
@@ -20,11 +17,16 @@ byte incomingBuffer[BUFFER_SIZE];
 // define flow control states
 void wait_for_arm(void);
 void wait_for_start(void);
-void reset_outputs(void);
 void manual_control(void);
 
 // setup peripherals
 void setup() {
+  pinMode(19, OUTPUT);
+  digitalWrite(19, LOW);
+
+  while(1);
+
+
   // status light pins
   state_lights_init();
 
@@ -39,18 +41,13 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
 #endif
 
-#ifdef SONAR
-  // sonar pin modes
-  pinMode(SONAR_TRIG, OUTPUT);
-  pinMode(SONAR_ECHO, INPUT);
+  // initialise sonar
+#ifdef ENABLE_SONAR
+  sonar_init();
 #endif
 
   // output pin pwm settings
-  output_pins[SERVO_ID].attach(SERVO_TX);
-  output_pins[THROT_ID].attach(THROT_TX);
-
-  output_pins[SERVO_ID].write(SERVO_IDLE);
-  output_pins[THROT_ID].write(THROT_IDLE);
+  actuator_init();
 }
 
 void loop() {
@@ -73,26 +70,21 @@ void loop() {
 
   // main automatic control loop
   while (true) {
-    if (get_pwm(THROT_ID) < SHUTDOWN_THRESH) {
+    if (receiver_get_pwm(THROT_ID) < SHUTDOWN_THRESH) {
       // return manual control if sitck pushed forward
       Serial.write(SERIAL_MANUAL);
       manual_control();
       break;
     }
 
-#ifdef SONAR
-    if (millis() - last_sonar > SONAR_DELAY) {
-      // TODO read the sonar here
-      last_sonar = millis();
-    }
-#endif
+    // TODO read sonar here
 
     // take pwm value serial input from the computer
     if (Serial.available()) {
       // read two bytes of input
       Serial.readBytes(incomingBuffer, BUFFER_SIZE);
-      // write computer command to pwm peripheral
-      output_pins[incomingBuffer[0]].write(incomingBuffer[1]);
+      // write command to peripheral
+      actuator_write_index(incomingBuffer[0], incomingBuffer[1]);
     }
   }
 }
@@ -107,7 +99,7 @@ void wait_for_arm() {
   // wait for the trigger to be pressed for more than 2 seconds
   uint8_t timer_counter = 0;
   while (true) {
-    if (get_pwm(THROT_ID) > STARTUP_THRESH) {
+    if (receiver_get_pwm(THROT_ID) > STARTUP_THRESH) {
       // if trigger is pulled then increment timer
       timer_counter += 1;
       if (timer_counter == 1) {
@@ -133,7 +125,7 @@ void wait_for_arm() {
   buzzer_play_sound(SOUND_HIGH);
 
   // wait for trigger to be released
-  while (get_pwm(THROT_ID) > STARTUP_THRESH) {
+  while (receiver_get_pwm(THROT_ID) > STARTUP_THRESH) {
     ;
   }
 
@@ -154,7 +146,7 @@ void wait_for_start() {
   state_lights_set(GREEN);
 
   // wait for trigger to be pressed
-  while (get_pwm(THROT_ID) < STARTUP_THRESH) {
+  while (receiver_get_pwm(THROT_ID) < STARTUP_THRESH) {
     ;
   }
 
@@ -167,7 +159,7 @@ void wait_for_start() {
 // move to manual control loop feeding input from remote to output pins
 void manual_control() {
   // set throttle to neutral and steering to neutral
-  reset_outputs();
+  actuator_idle();
 
   // set lights to manual control
   state_lights_clear_all();
@@ -182,13 +174,13 @@ void manual_control() {
   uint8_t timer_counter = 0;
   while (true) {
     // set outputs to the remote inputs
-    output_pins[SERVO_ID].writeMicroseconds(get_pwm(SERVO_ID));
-    output_pins[THROT_ID].writeMicroseconds(get_pwm(THROT_ID));
+    actuator_write_index(THROT_ID, receiver_get_pwm(THROT_ID));
+    actuator_write_index(SERVO_ID, receiver_get_pwm(SERVO_ID));
 
     // check if the throttle is at idle and steering servo at full right to
     // exit full auto mode.
-    if (get_pwm(THROT_ID) < THROTTLE_IDLE &&
-        get_pwm(SERVO_ID) > STEERING_THRESH) {
+    if (receiver_get_pwm(THROT_ID) < THROTTLE_IDLE &&
+        receiver_get_pwm(SERVO_ID) > STEERING_THRESH) {
       timer_counter += 1;
       if (timer_counter > MANUAL_CUTOFF / MANUAL_DELAY) {
         // if we were in the above conditions for enough time then
@@ -205,13 +197,7 @@ void manual_control() {
   }
 
   // idle throttle and centre steering again
-  reset_outputs();
-}
-
-// idle throttle and centre steering
-void reset_outputs() {
-  output_pins[SERVO_ID].writeMicroseconds(SERVO_IDLE);
-  output_pins[THROT_ID].writeMicroseconds(THROT_IDLE);
+  actuator_idle();
 }
 
 

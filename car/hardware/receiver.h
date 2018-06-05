@@ -6,6 +6,8 @@
 // input pin numbers
 #define SERVO_RX 2
 #define THROT_RX 3
-static const uint8_t input_pins[] = { SERVO_RX, THROT_RX };
+
+void receiver_init(void);
+void receiver_receiver_get_pwm(uint8_t index);
 
 #endif  // RECEIVER_

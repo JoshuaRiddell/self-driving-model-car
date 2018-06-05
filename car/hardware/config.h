@@ -6,8 +6,13 @@
 // debug switch
 #define ENABLE_DEBUG  // enables debug messages
 #define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
-// #define SONAR  // enables sonar ranging
-#define BUZZER_DISABLE // disables the buzzer for quiet mode
+// #define ENABLE_SONAR  // enables sonar ranging
+// #define BUZZER_DISABLE // disables the buzzer for quiet mode
+
+// voltage sense pins
+#define SENSE_WALL 15
+#define SENSE_CPU_BATT 16
+#define SENSE_TRACT_BATT 17
 
 // serial paramters
 #define SERIAL_BAUD 115200
