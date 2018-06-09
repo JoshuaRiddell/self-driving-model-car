@@ -12,4 +12,7 @@ function echo {
 
 echo "Uploading to arduino..."
 
-arduino --upload --board arduino:avr:uno --port $CAR_ARDUINO_PORT $CAR_PROJECT_DIR/car/hardware/hardware.ino
+cd $DIR/../hardware
+
+make clean
+make flash
