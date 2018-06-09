@@ -12,9 +12,9 @@
 DEVICE     = atmega328p
 CLOCK      = 16000000
 PROGRAMMER = -c arduino -P /dev/ttyACM* -b 115200
-OBJECTS    = main.o
+# OBJECTS    = main.o actuator.o adxl345.o buzzer.o hmc5883l.o l3g4200d.o power.o ranging.o receiver.o leds.o
+OBJECTS    = main.o serial.o leds.o
 FUSES      = -U lfuse:w:0x64:m -U hfuse:w:0xdd:m -U efuse:w:0xff:m
-OBJ_DIR    = ./obj
 
 ######################################################################
 ######################################################################
@@ -22,13 +22,13 @@ OBJ_DIR    = ./obj
 # Tune the lines below only if you know what you are doing:
 
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
-COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+COMPILE = avr-gcc -std=c99 -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 # symbolic targets:
 all:	main.hex
 
 .c.o:
-	$(COMPILE) -c $< -o $(OBJ_DIR)/$@
+	$(COMPILE) -c $< -o $@
 
 .S.o:
 	$(COMPILE) -x assembler-with-cpp -c $< -o $@
@@ -53,11 +53,11 @@ load: all
 	bootloadHID main.hex
 
 clean:
-	rm -f main.hex main.elf $(OBJ_DIR)/$(OBJECTS)
+	rm -f main.hex main.elf $(OBJECTS)
 
 # file targets:
 main.elf: $(OBJECTS)
-	$(COMPILE) -o main.elf $(OBJ_DIR)/$(OBJECTS)
+	$(COMPILE) -o main.elf $(OBJECTS)
 
 main.hex: main.elf
 	rm -f main.hex

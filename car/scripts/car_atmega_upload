@@ -14,5 +14,8 @@ echo "Uploading to arduino..."
 
 cd $DIR/../hardware
 
+killall car_atmega_serial
+killall screen
+
 make clean
 make flash

@@ -1,5 +1,5 @@
 #include "receiver.h"
-#include "state_lights.h"
+#include "leds.h"
 
 // define pwm data caches
 volatile unsigned long prev_time[NUM_CHANNELS];

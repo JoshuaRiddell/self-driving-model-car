@@ -9,11 +9,6 @@
 
 
 
-// debug switch
-#define ENABLE_DEBUG  // enables debug messages
-#define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
-// #define ENABLE_SONAR  // enables sonar ranging
-// #define BUZZER_DISABLE // disables the buzzer for quiet mode
 
 // voltage sense pins
 #define SENSE_WALL 15
@@ -69,7 +64,15 @@
 #define SERIAL_MANUAL '3'
 
 // define pins
-#define WHITE 4  // on when car is in blocked flow waiting for user input
-#define BLUE 5
-#define GREEN 6  // car is currently armed and can move at any time
-#define RED 7
+#define LEDS_PORT PORTD
+#define LEDS_DDR DDRD
+
+#define WHITE_PIN PIND4  // on when car is in blocked flow waiting for user input
+#define BLUE_PIN PIND5
+#define GREEN_PIN PIND6  // car is currently armed and can move at any time
+#define RED_PIN PIND7
+
+#define LEDS_WHITE 1
+#define LEDS_BLUE 2
+#define LEDS_GREEN 3
+#define LEDS_RED 4
