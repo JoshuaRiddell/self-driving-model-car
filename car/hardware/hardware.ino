@@ -1,4 +1,5 @@
 #include <NewPing.h>
+#include <Wire.h>
 
 #include "config.h"
 #include "ranging.h"
@@ -22,6 +23,8 @@ void manual_control(void);
 
 // setup peripherals
 void setup() {
+  Wire.begin();
+
   // initialise power control
   power_init();
 
