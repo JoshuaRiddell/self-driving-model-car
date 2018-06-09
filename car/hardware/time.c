@@ -30,7 +30,7 @@ uint32_t time_millis(void) {
 
 uint32_t time_micros(void) {
     // millis*1000 (no overflow) + residual from timer
-    return ( (millis % ((UINT32_MAX+500)/1000)) * 1000)
+    return ( (millis % 4294967) * 1000)
             + COUNT_TO_MICROS(TCNT1);
 }
 

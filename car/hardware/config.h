@@ -6,11 +6,15 @@
 // debug message switches
 #define POWER_DEBUG_MSG
 
-
-
 // input pin numbers
-#define SERVO_RX 2
-#define THROT_RX 3
+#define RECEIVER_DDR DDRD
+#define RECEIVER_PORT PORTD
+#define RECEIVER_SERVO_PIN PD2
+#define RECEIVER_THROT_PIN PD3
+
+
+
+
 
 
 
@@ -71,10 +75,10 @@
 #define LEDS_PORT PORTD
 #define LEDS_DDR DDRD
 
-#define WHITE_PIN PIND4  // on when car is in blocked flow waiting for user input
-#define BLUE_PIN PIND5
-#define GREEN_PIN PIND6  // car is currently armed and can move at any time
-#define RED_PIN PIND7
+#define WHITE_PIN PD4  // on when car is in blocked flow waiting for user input
+#define BLUE_PIN PD5
+#define GREEN_PIN PD6  // car is currently armed and can move at any time
+#define RED_PIN PD7
 
 #define LEDS_WHITE 1
 #define LEDS_BLUE 2

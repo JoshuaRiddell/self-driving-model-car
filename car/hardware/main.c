@@ -38,10 +38,7 @@ int main() {
   while (1) {
     _delay_ms(1000);
 
-    uint32_t millis = time_millis();
-    uint32_t micros = time_micros();
-
-    printf("time: %ld %ld\n", millis, micros);
+    printf("rx: %d %d\n", receiver_get_pwm(0), receiver_get_pwm(1));
     leds_toggle(LEDS_WHITE);
   }
 
@@ -52,6 +49,7 @@ void hardware_init(void) {
   time_init();
   serial_init(SERIAL_BAUD);
   leds_init();
+  receiver_init();
 }
 
 // // setup peripherals
