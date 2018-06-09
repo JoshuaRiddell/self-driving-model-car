@@ -3,6 +3,12 @@
 // servo:   1032  1364  1700
 // throt:   1020  1556  2056
 
+// debug message switches
+#define POWER_DEBUG_MSG
+
+
+
+
 // debug switch
 #define ENABLE_DEBUG  // enables debug messages
 #define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
@@ -13,6 +19,14 @@
 #define SENSE_WALL 15
 #define SENSE_CPU_BATT 16
 #define SENSE_TRACT_BATT 17
+
+// power control pins
+#define CTL_ESC 13
+#define CTL_WALL 18
+#define CTL_CPU_BATT 19
+
+#define CTL_WALL_INTERRUPT PCINT9
+#define CTL_WALL_INTERRUPT_ENABLE PCIE1
 
 // serial paramters
 #define SERIAL_BAUD 115200

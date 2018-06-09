@@ -5,6 +5,7 @@
 #include "state_lights.h"
 #include "receiver.h"
 #include "buzzer.h"
+#include "power.h"
 
 // TODO
 // add proper tones
@@ -21,11 +22,8 @@ void manual_control(void);
 
 // setup peripherals
 void setup() {
-  pinMode(19, OUTPUT);
-  digitalWrite(19, LOW);
-
-  while(1);
-
+  // initialise power control
+  power_init();
 
   // status light pins
   state_lights_init();

@@ -2,6 +2,7 @@
 
 # opens a serial connection to the arduino
 
-source ../../config.txt
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/../../config.txt
 
 screen $CAR_ARDUINO_PORT $CAR_ARDUINO_BAUD

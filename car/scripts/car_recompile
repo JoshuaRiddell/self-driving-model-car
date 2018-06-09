@@ -1,9 +1,13 @@
 #!/bin/bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/../../config.txt
+
 # re-define echo to prepend with car_remote and colour green to indicate remoteness
 function echo {
 	builtin echo -e '\e[92mcar_remote: ' "$@" ;
 }
+
 
 echo "Compiling code..."
 echo "Restarting persistent service..."
