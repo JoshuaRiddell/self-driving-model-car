@@ -19,8 +19,6 @@ void leds_init() {
   for (uint8_t n = 0; n < 3; ++n) {
     leds_strum();
   }
-
-  leds_set(LEDS_WHITE);
 }
 
 // "wave" effect going through the light colours

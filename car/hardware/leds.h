@@ -9,11 +9,6 @@
 // green only: car is armed and in autonomous mode, reading from serial input
 // green + blue: car is armed and in manual mode, reading from the radio receiver
 
-#define LEDS_WHITE 1
-#define LEDS_BLUE 2
-#define LEDS_GREEN 3
-#define LEDS_RED 4
-
 void leds_init();
 void leds_strum();
 void leds_set(uint8_t pin);

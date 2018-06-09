@@ -48,6 +48,8 @@ void serial_init(long baud) {
     // attach stream to stdio streams
     stdout = &serial_stream;
     stdin = &serial_stream;
+
+    sei();
 }
 
 bool serial_available(void) {
@@ -96,10 +98,10 @@ static inline void buffer_init(volatile serial_buffer_t *buff) {
 
 static inline uint8_t buffer_push(volatile serial_buffer_t *buff, char data) {
     // put data on the stack
-    buff->data[buff->in] = data;
+    buff->data[buff->in++] = data;
     
     // check for wraparound
-    if (++buff->in > SERIAL_BUFFER_SIZE) {
+    if (buff->in >= SERIAL_BUFFER_SIZE) {
         buff->in = 0;
     }
 
@@ -110,7 +112,7 @@ static inline char buffer_pop(volatile serial_buffer_t *buff) {
     char data = buff->data[buff->out++];
 
     // check for wraparound
-    if (buff->out > SERIAL_BUFFER_SIZE) {
+    if (buff->out >= SERIAL_BUFFER_SIZE) {
         buff->out = 0;
     }
 

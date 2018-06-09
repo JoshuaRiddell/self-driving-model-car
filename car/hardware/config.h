@@ -8,6 +8,10 @@
 
 
 
+// input pin numbers
+#define SERVO_RX 2
+#define THROT_RX 3
+
 
 
 // voltage sense pins

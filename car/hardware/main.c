@@ -5,11 +5,17 @@
 // #include "config.h"
 // #include "ranging.h"
 #include "leds.h"
-// #include "receiver.h"
+#include "receiver.h"
 // #include "buzzer.h"
 // #include "power.h"
 #include "serial.h"
 #include "config.h"
+#include "time.h"
+
+
+
+
+#include <avr/io.h>
 
 
 // TODO
@@ -27,16 +33,23 @@ void hardware_init(void);
 int main() {
   hardware_init();
 
+  printf(">>>STARTUP<<<\n");
+
   while (1) {
     _delay_ms(1000);
-    printf("test %d %d %d\n", 1, 2, 3);
-    leds_toggle(LEDS_RED);
+
+    uint32_t millis = time_millis();
+    uint32_t micros = time_micros();
+
+    printf("time: %ld %ld\n", millis, micros);
+    leds_toggle(LEDS_WHITE);
   }
 
   return 0;
 }
 
 void hardware_init(void) {
+  time_init();
   serial_init(SERIAL_BAUD);
   leds_init();
 }
