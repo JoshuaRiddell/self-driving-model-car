@@ -1,4 +1,4 @@
-#include <Servo.h>
+#include <avr/io.h>
 
 #include "actuator.h"
 

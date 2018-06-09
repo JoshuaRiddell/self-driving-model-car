@@ -5,37 +5,31 @@
 
 #include "time.h"
 
-#define PRESCALER 8  //1/8
-#define TIMER_PERIOD 1  //ms
-#define OCR_VAL (TIMER_PERIOD * F_CPU / PRESCALER / 1000)
-#define COUNT_TO_MICROS(val) ((val + 1) / 2) // PRESCALER / (F_CPU / 1000000))
-#define COUNT_TO_MILLIS(val) ((val + 1000) / 2000) // PRESCALER / 1000 / (F_CPU / 1000000))
-
-static uint32_t millis;
+static volatile uint32_t timer_0_overflow_count;
 
 void time_init(void) {
-    millis = 0;
+    cli();
 
-    TCCR1A = 0;    // CTC mode
-    TCCR1B = _BV(CS11)|_BV(WGM12);     // 1/8 scaler
-    TIMSK1 = _BV(OCIE1A);  // set interrupt on compa
-    OCR1A = (uint16_t)OCR_VAL;        // count up to timer period
+    timer_0_overflow_count = 0;
+
+    TCCR0B = _BV(CS00)|_BV(CS01);     // 1/64 scaler
+    TIMSK0 = _BV(OCIE0A);  // set interrupt on compa
 
     sei();         //enable interrupts
 }
 
 uint32_t time_millis(void) {
-    return millis + COUNT_TO_MILLIS(TCNT1);
+    return timer_0_overflow_count
+            + (timer_0_overflow_count*24/1000)
+            + TCNT0;
 }
 
 uint32_t time_micros(void) {
-    // millis*1000 (no overflow) + residual from timer
-    return ( (millis % 4294967) * 1000)
-            + COUNT_TO_MICROS(TCNT1);
+    return ((timer_0_overflow_count << 8) + TCNT0) << 2;
 }
 
-ISR (TIMER1_COMPA_vect) {
+ISR (TIMER0_COMPA_vect) {
     // update the counters
-    millis += TIMER_PERIOD;
+    ++timer_0_overflow_count;
 }
 

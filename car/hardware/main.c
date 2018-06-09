@@ -36,7 +36,7 @@ int main() {
   printf(">>>STARTUP<<<\n");
 
   while (1) {
-    _delay_ms(1000);
+    _delay_ms(100);
 
     printf("rx: %d %d\n", receiver_get_pwm(0), receiver_get_pwm(1));
     leds_toggle(LEDS_WHITE);
