@@ -2,7 +2,8 @@
 #define ACTUATOR_
 
 void actuator_init(void);
-void actuator_write_index(uint8_t index, uint8_t val);
+void actuator_write_servo(uint16_t width);
+void actuator_write_throt(uint16_t width);
 void actuator_idle(void);
 
 #endif

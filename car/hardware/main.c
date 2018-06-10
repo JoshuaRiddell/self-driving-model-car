@@ -2,15 +2,16 @@
 
 #include <util/delay.h>
 
-// #include "config.h"
+#include "config.h"
 // #include "ranging.h"
 #include "leds.h"
 #include "receiver.h"
-// #include "buzzer.h"
-// #include "power.h"
+#include "power.h"
 #include "serial.h"
 #include "config.h"
 #include "time.h"
+#include "buzzer.h"
+#include "actuator.h"
 
 
 
@@ -35,11 +36,14 @@ int main() {
 
   printf(">>>STARTUP<<<\n");
 
-  while (1) {
-    _delay_ms(100);
+  power_esc_off();
 
-    printf("rx: %d %d\n", receiver_get_pwm(0), receiver_get_pwm(1));
-    leds_toggle(LEDS_WHITE);
+  uint16_t pulse;
+  while (1) {
+    pulse = receiver_get_pwm(THROT_ID);
+    actuator_write_throt(pulse);
+    pulse = receiver_get_pwm(SERVO_ID);
+    actuator_write_servo(pulse);
   }
 
   return 0;
@@ -50,6 +54,9 @@ void hardware_init(void) {
   serial_init(SERIAL_BAUD);
   leds_init();
   receiver_init();
+  buzzer_init();
+  power_init(POWER_BATTERY);
+  actuator_init();
 }
 
 // // setup peripherals

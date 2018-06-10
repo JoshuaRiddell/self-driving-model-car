@@ -6,12 +6,21 @@
 // debug message switches
 #define POWER_DEBUG_MSG
 
+// feature switches
+// #define DISABLE_BUZZER
+
 // input pin numbers
 #define RECEIVER_DDR DDRD
 #define RECEIVER_PORT PORTD
 #define RECEIVER_SERVO_PIN PD2
 #define RECEIVER_THROT_PIN PD3
 
+// output pins
+#define ACTUATOR_DDR DDRB
+#define ACTUATOR_SERVO_PIN PB1
+#define ACTAUTOR_SERVO_OCR OCR1B
+#define ACTUATOR_THROT_PIN PB2
+#define ACTAUTOR_THROT_OCR OCR1A
 
 
 
@@ -19,14 +28,22 @@
 
 
 // voltage sense pins
-#define SENSE_WALL 15
-#define SENSE_CPU_BATT 16
-#define SENSE_TRACT_BATT 17
+#define SENSE_DDR DDRC
+#define SENSE_PIN PINC
+#define SENSE_WALL_PIN PC1
+#define SENSE_CPU_BATT_PIN PC2
+#define SENSE_TRACT_BATT_PIN PC3
 
 // power control pins
-#define CTL_ESC 13
-#define CTL_WALL 18
-#define CTL_CPU_BATT 19
+#define CTL_CPU_DDR DDRC
+#define CTL_CPU_PORT PORTC
+
+#define CTL_ESC_DDR DDRB
+#define CTL_ESC_PORT PORTB
+
+#define CTL_ESC_PIN PB5
+#define CTL_WALL_PIN PC4
+#define CTL_CPU_BATT_PIN PC5
 
 #define CTL_WALL_INTERRUPT PCINT9
 #define CTL_WALL_INTERRUPT_ENABLE PCIE1
@@ -36,7 +53,10 @@
 #define BUFFER_SIZE 2
 
 // buzzer parameters
-#define BUZZER_PIN 14
+#define BUZZER_DDR DDRC
+#define BUZZER_PORT PORTC
+#define BUZZER_PIN PC0
+
 #define BUZZ_DURATION 10000
 #define SOUND_HIGH 100
 #define SOUND_MIDDLE 110
@@ -47,9 +67,6 @@
 #define THROT_ID 1
 #define NUM_CHANNELS 2
 
-// output pins
-#define SERVO_TX 10
-#define THROT_TX 11
 
 // idle values for outputs
 #define SERVO_IDLE 1364
