@@ -38,12 +38,10 @@ int main() {
 
   power_esc_off();
 
-  uint16_t pulse;
+  receiver_passthrough_set();
   while (1) {
-    pulse = receiver_get_pwm(THROT_ID);
-    actuator_write_throt(pulse);
-    pulse = receiver_get_pwm(SERVO_ID);
-    actuator_write_servo(pulse);
+    printf("vals: %u %u\n", actuator_read_servo(), actuator_read_throt());
+    _delay_ms(500);
   }
 
   return 0;

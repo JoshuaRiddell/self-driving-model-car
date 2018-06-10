@@ -12,20 +12,15 @@
 // input pin numbers
 #define RECEIVER_DDR DDRD
 #define RECEIVER_PORT PORTD
-#define RECEIVER_SERVO_PIN PD2
-#define RECEIVER_THROT_PIN PD3
+#define RECEIVER_SERVO_PIN PD3
+#define RECEIVER_THROT_PIN PD2
 
 // output pins
 #define ACTUATOR_DDR DDRB
 #define ACTUATOR_SERVO_PIN PB1
-#define ACTAUTOR_SERVO_OCR OCR1B
+#define ACTAUTOR_SERVO_OCR OCR1A
 #define ACTUATOR_THROT_PIN PB2
-#define ACTAUTOR_THROT_OCR OCR1A
-
-
-
-
-
+#define ACTAUTOR_THROT_OCR OCR1B
 
 // voltage sense pins
 #define SENSE_DDR DDRC

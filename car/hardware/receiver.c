@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "receiver.h"
+#include "actuator.h"
 
 #include "time.h"
 
@@ -14,9 +15,11 @@
 volatile uint32_t prev_time[NUM_CHANNELS];
 volatile uint16_t pwm_val[NUM_CHANNELS];
 
+static bool passthrough;
+
 void handle_servo_intr(void);
 void handle_throt_intr(void);
-inline void handle_interrupt(uint8_t pin_id, bool change);
+static inline void handle_interrupt(uint8_t pin_id, bool change);
 
 void receiver_init(void) {
   // reciever pin modes
@@ -30,11 +33,17 @@ void receiver_init(void) {
   sei();
 }
 
+void receiver_passthrough(bool pass) {
+  passthrough = pass;
+
+  if (~pass) actuator_idle();
+}
+
 uint16_t receiver_get_pwm(uint8_t index) {
   return pwm_val[index];
 }
 
-inline void handle_interrupt(uint8_t pin_id, bool change) {
+static inline void handle_interrupt(uint8_t pin_id, bool change) {
   // handle the pwm counters
   uint32_t micros = time_micros();
   if (change) {
@@ -46,13 +55,24 @@ inline void handle_interrupt(uint8_t pin_id, bool change) {
     } else {
       pwm_val[pin_id] = time_micros() - prev_time[pin_id];
     }
+
+    if (passthrough) {
+      switch(pin_id) {
+        case SERVO_ID:
+          actuator_write_servo(pwm_val[pin_id]);
+          break;
+        case THROT_ID:
+          actuator_write_throt(pwm_val[pin_id]);
+          break;
+      }
+    }
   }
 }
 
 ISR(INT0_vect) {
-  handle_interrupt(SERVO_ID, PIND&_BV(PIND2));
+  handle_interrupt(THROT_ID, PIND&_BV(PIND2));
 }
 
 ISR(INT1_vect) {
-  handle_interrupt(THROT_ID, PIND&_BV(PIND3));
+  handle_interrupt(SERVO_ID, PIND&_BV(PIND3));
 }
