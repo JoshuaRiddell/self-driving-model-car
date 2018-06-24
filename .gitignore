@@ -6,6 +6,7 @@ QUTDroidRacing/Library/
 
 *.csv
 *.PNG
+*.meta
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
