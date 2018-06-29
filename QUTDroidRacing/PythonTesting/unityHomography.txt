@@ -1,0 +1,12 @@
+367, 864 #botom left
+1585, 863 #bottom right
+
+1234, 592 #top right
+700,592 #top left
+
+
+145, 703 #botom left
+1773, 703 #bottom right
+
+1258, 499 #top right
+660,499 #top left

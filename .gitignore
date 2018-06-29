@@ -1,2 +1,41 @@
+# =============== #
+# Unity generated #
+# =============== #
+QUTDroidRacing/Temp/
+QUTDroidRacing/Library/
+
+*.csv
+*.PNG
+*.meta
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+QUTDroidRacing/ExportedObj/
+QUTDroidRacing/obj/
+QUTDroidRacing/*.svd
+QUTDroidRacing/*.userprefs
+QUTDroidRacing/*.csproj
+QUTDroidRacing/*.pidb
+QUTDroidRacing/*.suo
+QUTDroidRacing/*.sln
+QUTDroidRacing/*.user
+QUTDroidRacing/*.unityproj
+QUTDroidRacing/*.booproj
+
+QUTDroidRacing/.vs/
+
+# ============ #
+# OS generated #
+# ============ #
+QUTDroidRacing/.DS_Store
+QUTDroidRacing/.DS_Store?
+QUTDroidRacing/._*
+QUTDroidRacing/.Spotlight-V100
+QUTDroidRacing/.Trashes
+QUTDroidRacing/ehthumbs.db
+QUTDroidRacing/Thumbs.db
+
+
 *.pyc
 /computer/images/*
+*.jpg
