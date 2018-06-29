@@ -10,6 +10,7 @@
 void power_init(uint8_t mode);
 void power_esc_set(bool val);
 void power_set_cpu_mode(uint8_t mode);
+uint16_t power_read_index(uint8_t index);
 
 #define power_esc_on() power_esc_set(true)
 #define power_esc_off() power_esc_set(false)

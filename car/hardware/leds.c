@@ -4,16 +4,15 @@
 #include "leds.h"
 #include "config.h"
 
-#define NUM_LIGHTS 4
+#define NUM_LIGHTS 2
 
-#define ALL_LEDS (_BV(WHITE_PIN)|_BV(BLUE_PIN)|_BV(GREEN_PIN)|_BV(RED_PIN))
-
-const uint8_t lights[] = { WHITE_PIN, BLUE_PIN, GREEN_PIN, RED_PIN };
+const uint8_t lights[] = { LEDS_1_PIN, LEDS_2_PIN };
 
 // set up light pin modes and set to default state
 void leds_init() {
   // setup lights pinmode
-  LEDS_DDR = ALL_LEDS;
+  LEDS_1_DDR |= _BV(LEDS_1_PIN);
+  LEDS_2_DDR |= _BV(LEDS_2_PIN);
 
   // strum the lights 3 times for added jazz
   for (uint8_t n = 0; n < 3; ++n) {
@@ -36,21 +35,43 @@ void leds_strum() {
 
 // set a light
 void leds_set(uint8_t pin) {
-  LEDS_PORT |= _BV(lights[pin]);
+  switch (pin) {
+    case LEDS_1:
+      LEDS_1_PORT |= _BV(lights[pin]);
+      break;
+    case LEDS_2:
+      LEDS_1_PORT |= _BV(lights[pin]);
+      break;
+  }
 }
 
 // clear a light
 void leds_clear(uint8_t pin) {
-  LEDS_PORT &= ~_BV(lights[pin]);
+  switch (pin) {
+    case LEDS_1:
+      LEDS_1_PORT &= ~_BV(lights[pin]);
+      break;
+    case LEDS_2:
+      LEDS_2_PORT &= ~_BV(lights[pin]);
+      break;
+  }
 }
 
 // clear all lights
 void leds_clear_all() {
-  LEDS_PORT &= ~(ALL_LEDS);
+  LEDS_1_PORT &= ~_BV(LEDS_1_PIN);
+  LEDS_2_PORT &= ~_BV(LEDS_2_PIN);
 }
 
 // toggle a light value
 void leds_toggle(uint8_t pin) {
-  LEDS_PORT ^= _BV(lights[pin]);
+  switch (pin) {
+    case LEDS_1:
+      LEDS_1_PORT ^= _BV(lights[pin]);
+      break;
+    case LEDS_2:
+      LEDS_2_PORT ^= _BV(lights[pin]);
+      break;
+  }
 }
 

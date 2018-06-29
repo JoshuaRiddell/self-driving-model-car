@@ -13,9 +13,6 @@
 #include "buzzer.h"
 #include "actuator.h"
 
-
-
-
 #include <avr/io.h>
 
 
@@ -36,12 +33,18 @@ int main() {
 
   printf(">>>STARTUP<<<\n");
 
-  power_esc_off();
+  leds_set(LEDS_1);
+
+  // power_esc_off();
 
   receiver_passthrough_set();
   while (1) {
-    printf("vals: %u %u\n", actuator_read_servo(), actuator_read_throt());
-    _delay_ms(500);
+    printf("vals: %X; %u %u %u\n",
+        PORTC,
+        power_read_index(0),
+        power_read_index(1),
+        power_read_index(2));
+    _delay_ms(1000);
   }
 
   return 0;
@@ -53,7 +56,7 @@ void hardware_init(void) {
   leds_init();
   receiver_init();
   buzzer_init();
-  power_init(POWER_BATTERY);
+  power_init(POWER_ADAPTIVE);
   actuator_init();
 }
 
