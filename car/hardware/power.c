@@ -83,7 +83,7 @@ void power_set_cpu_mode(uint8_t mode) {
 }
 
 uint16_t power_read_index(uint8_t index) {
-    return ADC_TO_MV(adc_readings[index]);
+    return ADC_TO_MV(adc_readings[index]) * 3;
 }
 
 static void update_wall_power() {
@@ -118,8 +118,9 @@ static void update_wall_power() {
 // }
 
 ISR(ADC_vect) {
-    // adc_readings[read_index] = ADC;
-    adc_readings[read_index] = read_index;
+    adc_readings[read_index] = ADC;
+    // adc_readings[read_index] = read_index;
+    // adc_readings[read_index] = 1;
 
     ++read_index;
     read_index %= 3;

@@ -35,12 +35,12 @@ int main() {
 
   leds_set(LEDS_1);
 
-  // power_esc_off();
+  power_esc_on();
 
   receiver_passthrough_set();
   while (1) {
     printf("vals: %X; %u %u %u\n",
-        PORTC,
+        PINC,
         power_read_index(0),
         power_read_index(1),
         power_read_index(2));
