@@ -7,7 +7,7 @@
 #define POWER_DEBUG_MSG
 
 // feature switches
-#define DISABLE_BUZZER
+// #define DISABLE_BUZZER
 
 // input pin numbers
 #define RECEIVER_DDR DDRD
@@ -25,9 +25,9 @@
 // voltage sense pins
 #define SENSE_DDR DDRC
 #define SENSE_PIN PINC
-#define SENSE_WALL_PIN PC3
+#define SENSE_WALL_PIN PC5
 #define SENSE_CPU_BATT_PIN PC4
-#define SENSE_TRACT_BATT_PIN PC5
+#define SENSE_TRACT_BATT_PIN PC3
 
 // power control pins
 #define CTL_CPU_BATT_PIN PD4
@@ -42,7 +42,7 @@
 #define CTL_ESC_PORT PORTB
 #define CTL_ESC_DDR DDRB
 
-#define CTL_WALL_INTERRUPT PCINT11
+#define CTL_WALL_INTERRUPT PCINT13
 #define CTL_WALL_INTERRUPT_ENABLE PCIE1
 
 // serial paramters

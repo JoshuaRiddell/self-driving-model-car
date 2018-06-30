@@ -33,13 +33,19 @@ int main() {
 
   printf(">>>STARTUP<<<\n");
 
-  leds_set(LEDS_1);
+  // while (1) {
+  //   leds_set(LEDS_1);
+  //   power_esc_on();
+  //   _delay_ms(3000);
 
-  power_esc_on();
+  //   leds_clear(LEDS_1);
+  //   power_esc_off();
+  //   _delay_ms(3000);
+  // }
 
   receiver_passthrough_set();
   while (1) {
-    printf("vals: %X; %u %u %u\n",
+    printf("vals: 0x%X; %u %u %u\n",
         PINC,
         power_read_index(0),
         power_read_index(1),
@@ -60,17 +66,6 @@ void hardware_init(void) {
   actuator_init();
 }
 
-// // setup peripherals
-// void setup() {
-//   power_init();
-//   serial_init(SERIAL_BAUD);
-//   leds_init();
-//   receiver_init();
-//   buzzer_init();
-//   sonar_init();
-//   actuator_init();
-// }
-// 
 // void loop() {
 //   // disarmed state - brake applied and 1 layer of protection before automatic
 //   // driving starts. To move to next stage pull trigger for 2 seconds then
