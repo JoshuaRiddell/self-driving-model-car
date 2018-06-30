@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
 	car = UnityCarController()
 
-	actualVelocity = 8.0
+	actualVelocity = 5.0
 	lastTime = 0
 
 	heading = 0
@@ -99,7 +99,12 @@ if __name__ == "__main__":
 		cam.receive()
 		if cam.imageReceived:
 			img, telem = cam.recv_image()
-			radius = find_path(img)
+			radius, pathImage = find_path(img)
+
+			# cv2.namedWindow('Image1', cv2.WINDOW_NORMAL)
+			# cv2.imshow('Image1', pathImage)
+			# cv2.waitKey(1)
+
 			radius /= 100
 			if telemReceived:
 				pathPlanned = True
@@ -127,11 +132,19 @@ if __name__ == "__main__":
 				# actualVelocity = 0
 
 			# print "Sent: %f" % steeringAngle
-			try:
-				if pathPlanned:
-					car.send_command(actualVelocity, -steeringAngle)
-			except:
-				break
+			# try:
+			if pathPlanned:
+				print "Steering angle: ", -steeringAngle
+				car.send_command(actualVelocity, -steeringAngle)
+				h, w, d = pathImage.shape
+				xP = planner.currentX
+				yP = planner.currentY
+				# cv2.circle(pathImage, (int(xP) + w/2, h-int(yP)), 5,(0,255,0))
+				# cv2.namedWindow('Image1', cv2.WINDOW_NORMAL)
+				# cv2.imshow('Image1', pathImage)
+				# cv2.waitKey(1)
+			# except:
+			# 	break
 
 		# time.sleep(0.1)
 

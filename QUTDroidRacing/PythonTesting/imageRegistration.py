@@ -286,22 +286,47 @@ def find_path(img):
 			y = pt[1]
 			scorePositive += (x*x + 2*x*r + y*y) * (x*x + 2*x*r + y*y)
 			scoreNegative += (x*x - 2*x*r + y*y) * (x*x - 2*x*r + y*y)
-		print scorePositive, scoreNegative
+		# print scorePositive, scoreNegative
 		if scoreNegative < scorePositive:
 			radius *= -1
 	radius *= -1
 
+	
+	xSum = 0
+	ySum = 0
+	for pt in goodPoints:
+		xSum += pt[0]
+		ySum += pt[1]
+
+	if len(goodPoints) == 0:
+		radius = 50
+		xAve = 0
+		yAve = 0 
+	else:
+		xAve = int(xSum / len(goodPoints))
+		yAve = int(ySum / len(goodPoints))
+		if abs(xAve) == 0:
+			# pass# break
+			radius = 100000000
+		else:	
+			t = np.rad2deg(np.arctan(yAve*1.0/xAve))
+			a = 180 - 2 * t
+			radius += yAve / np.sin(np.deg2rad(a))
+			radius /= 2
+	cv2.circle(img1, (xAve + w/2, h-yAve), 5,(0,0,255)) 
+
 	if (abs(radius) < 200):
 		radius = 10000
 	print "Radius: ", radius
+
 	
 	cv2.circle(img1, (int(w/2 + radius), h), int(abs(radius)),(0,0,255)) 
-	cv2.namedWindow('Image1', cv2.WINDOW_NORMAL)
-	cv2.imshow('Image1', img1)
-	# plt.plot(xs, ys, '.')
-	# plt.show()
-	cv2.waitKey(1)
-	return radius
+	# cv2.namedWindow('Image1', cv2.WINDOW_NORMAL)
+	# cv2.imshow('Image1', img1)
+	# # plt.plot(xs, ys, '.')
+	# # plt.show()
+	# cv2.waitKey(1)
+	return radius, img1
 
 
 SHOW_IMG_1 = True

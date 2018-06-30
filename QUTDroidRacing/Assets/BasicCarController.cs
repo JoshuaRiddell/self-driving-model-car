@@ -52,10 +52,12 @@ public class BasicCarController : MonoBehaviour {
 		clientSocket.Connect (host, port);
 		stream = clientSocket.GetStream ();
 
+		theta = car.eulerAngles.y;
 		wheelBase = frontLeftWheel.localPosition.z - rearLeftWheel.localPosition.z;
 		//car.position = new Vector3 (0.0f, rideHeight, 0.0f);
 		//car.eulerAngles = new Vector3 (0.0f, theta, 0.0f);
 		StartCoroutine (send_telemetry());
+
 	}
 	
 	// Update is called once per frame
