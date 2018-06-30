@@ -6,29 +6,43 @@
 // debug message switches
 #define POWER_DEBUG_MSG
 
+// feature switches
+#define DISABLE_BUZZER
+
 // input pin numbers
 #define RECEIVER_DDR DDRD
 #define RECEIVER_PORT PORTD
 #define RECEIVER_SERVO_PIN PD2
 #define RECEIVER_THROT_PIN PD3
 
-
-
-
-
-
+// output pins
+#define ACTUATOR_DDR DDRB
+#define ACTUATOR_SERVO_PIN PB1
+#define ACTAUTOR_SERVO_OCR OCR1A
+#define ACTUATOR_THROT_PIN PB2
+#define ACTAUTOR_THROT_OCR OCR1B
 
 // voltage sense pins
-#define SENSE_WALL 15
-#define SENSE_CPU_BATT 16
-#define SENSE_TRACT_BATT 17
+#define SENSE_DDR DDRC
+#define SENSE_PIN PINC
+#define SENSE_WALL_PIN PC3
+#define SENSE_CPU_BATT_PIN PC4
+#define SENSE_TRACT_BATT_PIN PC5
 
 // power control pins
-#define CTL_ESC 13
-#define CTL_WALL 18
-#define CTL_CPU_BATT 19
+#define CTL_CPU_BATT_PIN PD4
+#define CTL_CPU_BATT_PORT PORTD
+#define CTL_CPU_BATT_DDR DDRD
 
-#define CTL_WALL_INTERRUPT PCINT9
+#define CTL_WALL_PIN PD5
+#define CTL_WALL_PORT PORTD
+#define CTL_WALL_DDR DDRD
+
+#define CTL_ESC_PIN PB5
+#define CTL_ESC_PORT PORTB
+#define CTL_ESC_DDR DDRB
+
+#define CTL_WALL_INTERRUPT PCINT11
 #define CTL_WALL_INTERRUPT_ENABLE PCIE1
 
 // serial paramters
@@ -36,7 +50,10 @@
 #define BUFFER_SIZE 2
 
 // buzzer parameters
-#define BUZZER_PIN 14
+#define BUZZER_PIN PD6
+#define BUZZER_PORT PORTD
+#define BUZZER_DDR DDRD
+
 #define BUZZ_DURATION 10000
 #define SOUND_HIGH 100
 #define SOUND_MIDDLE 110
@@ -47,9 +64,6 @@
 #define THROT_ID 1
 #define NUM_CHANNELS 2
 
-// output pins
-#define SERVO_TX 10
-#define THROT_TX 11
 
 // idle values for outputs
 #define SERVO_IDLE 1364
@@ -72,15 +86,32 @@
 #define SERIAL_MANUAL '3'
 
 // define pins
-#define LEDS_PORT PORTD
-#define LEDS_DDR DDRD
+#define LEDS_1_PIN PC2
+#define LEDS_1_PORT PORTC
+#define LEDS_1_DDR DDRC
 
-#define WHITE_PIN PD4  // on when car is in blocked flow waiting for user input
-#define BLUE_PIN PD5
-#define GREEN_PIN PD6  // car is currently armed and can move at any time
-#define RED_PIN PD7
+#define LEDS_2_PIN PD7
+#define LEDS_2_PORT PORTD
+#define LEDS_2_DDR DDRD
 
-#define LEDS_WHITE 1
-#define LEDS_BLUE 2
-#define LEDS_GREEN 3
-#define LEDS_RED 4
+#define LEDS_EXT_PIN PB3
+#define LEDS_EXT_PORT PORTB
+#define LEDS_EXT_DDR DDRB
+
+#define SONAR_ECHO_PIN PB4
+#define SONAR_ECHO_PORT PORTB
+#define SONAR_ECHO_DDR DDRB
+
+#define SONAR_TRIG_PIN PB0
+#define SONAR_TRIG_PORT PORTB
+#define SONAR_TRIG_DDR DDRB
+
+#define ENCODER_PIN PINC
+#define ENCODER_DDR 
+
+#define ENCODER_1_PIN
+#define ENCODER_2_PIN
+
+#define ENCODER_INTERRUPT_REGISTER PCIE1
+#define ENCODER_1_INTERRUPT PCINT9
+#define ENCODER_2_INTERRUPT PCINT8
