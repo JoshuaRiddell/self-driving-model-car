@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include <util/delay.h>
 
@@ -12,6 +13,7 @@
 #include "time.h"
 #include "buzzer.h"
 #include "actuator.h"
+#include "encoder.h"
 
 #include <avr/io.h>
 
@@ -33,23 +35,14 @@ int main() {
 
   printf(">>>STARTUP<<<\n");
 
-  // while (1) {
-  //   leds_set(LEDS_1);
-  //   power_esc_on();
-  //   _delay_ms(3000);
+  pos_t pos;
 
-  //   leds_clear(LEDS_1);
-  //   power_esc_off();
-  //   _delay_ms(3000);
-  // }
-
-  receiver_passthrough_set();
   while (1) {
-    printf("vals: 0x%X; %u %u %u\n",
-        PINC,
-        power_read_index(0),
-        power_read_index(1),
-        power_read_index(2));
+    encoder_get_pos(&pos);
+    encoder_update();
+
+    printf("pos x:%u y:%u t:%u\n", pos.x, pos.y, pos.theta);
+
     _delay_ms(1000);
   }
 
@@ -64,6 +57,7 @@ void hardware_init(void) {
   buzzer_init();
   power_init(POWER_ADAPTIVE);
   actuator_init();
+  encoder_init();
 }
 
 // void loop() {
