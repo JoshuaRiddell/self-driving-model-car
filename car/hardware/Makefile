@@ -12,8 +12,7 @@
 DEVICE     = atmega328p
 CLOCK      = 16000000
 PROGRAMMER = -c arduino -P /dev/ttyACM* -b 115200
-# OBJECTS    = main.o actuator.o adxl345.o buzzer.o hmc5883l.o l3g4200d.o power.o ranging.o receiver.o leds.o
-OBJECTS    = main.o serial.o leds.o time.o receiver.o buzzer.o actuator.o power.o
+OBJECTS    = main.o serial.o leds.o time.o receiver.o buzzer.o actuator.o power.o quick_math.o
 FUSES      = -U lfuse:w:0x64:m -U hfuse:w:0xdd:m -U efuse:w:0xff:m
 
 ######################################################################
