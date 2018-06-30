@@ -40,7 +40,7 @@ void leds_set(uint8_t pin) {
       LEDS_1_PORT |= _BV(lights[pin]);
       break;
     case LEDS_2:
-      LEDS_1_PORT |= _BV(lights[pin]);
+      LEDS_2_PORT |= _BV(lights[pin]);
       break;
   }
 }
