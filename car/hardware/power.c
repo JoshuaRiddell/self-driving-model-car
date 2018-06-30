@@ -99,10 +99,7 @@ uint16_t power_read_index(uint8_t index) {
 
 static void update_wall_power() {
     if (time_millis() - last_change_ms < DEBOUNCE_TIME) {
-        // leds_clear(LEDS_2);
         return;
-    } else {
-        // leds_set(LEDS_2);
     }
 
     switch(power_mode) {
@@ -134,13 +131,11 @@ inline static void power_set_cpu(uint8_t index) {
 
         // change the state
         if (index == WALL_INDEX) {
-            leds_set(LEDS_1);
             leds_clear(LEDS_2);
             CPU_BATT_OFF();
             WALL_ON();
         } else if (index == CPU_BATT_INDEX) {
             leds_set(LEDS_2);
-            leds_clear(LEDS_1);
             WALL_OFF();
             CPU_BATT_ON();
         }
