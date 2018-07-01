@@ -7,7 +7,7 @@
 #define POWER_DEBUG_MSG
 
 // feature switches
-#define DISABLE_BUZZER
+// #define DISABLE_BUZZER
 
 // input pin numbers
 #define RECEIVER_DDR DDRD
@@ -25,9 +25,9 @@
 // voltage sense pins
 #define SENSE_DDR DDRC
 #define SENSE_PIN PINC
-#define SENSE_WALL_PIN PC3
+#define SENSE_WALL_PIN PC5
 #define SENSE_CPU_BATT_PIN PC4
-#define SENSE_TRACT_BATT_PIN PC5
+#define SENSE_TRACT_BATT_PIN PC3
 
 // power control pins
 #define CTL_CPU_BATT_PIN PD4
@@ -41,9 +41,6 @@
 #define CTL_ESC_PIN PB5
 #define CTL_ESC_PORT PORTB
 #define CTL_ESC_DDR DDRB
-
-#define CTL_WALL_INTERRUPT PCINT11
-#define CTL_WALL_INTERRUPT_ENABLE PCIE1
 
 // serial paramters
 #define SERIAL_BAUD 115200
@@ -63,7 +60,6 @@
 #define SERVO_ID 0
 #define THROT_ID 1
 #define NUM_CHANNELS 2
-
 
 // idle values for outputs
 #define SERVO_IDLE 1364
@@ -107,11 +103,11 @@
 #define SONAR_TRIG_DDR DDRB
 
 #define ENCODER_PIN PINC
-#define ENCODER_DDR 
+#define ENCODER_DDR DDRC
 
-#define ENCODER_1_PIN
-#define ENCODER_2_PIN
+#define ENCODER_LEFT_PIN PC0
+#define ENCODER_RIGHT_PIN PC1
 
-#define ENCODER_INTERRUPT_REGISTER PCIE1
-#define ENCODER_1_INTERRUPT PCINT9
-#define ENCODER_2_INTERRUPT PCINT8
+#define ENCODER_INTERRUPT_ENABLE PCIE1
+#define ENCODER_LEFT_INTERRUPT PCINT9
+#define ENCODER_RIGHT_INTERRUPT PCINT8

@@ -16,8 +16,8 @@ void leds_clear(uint8_t pin);
 void leds_clear_all();
 void leds_toggle(uint8_t pin);
 
-#define LEDS_1 1
-#define LEDS_2 2
+#define LEDS_1 0
+#define LEDS_2 1
 
 #endif  // LEDS_
 

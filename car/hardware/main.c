@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include <util/delay.h>
 
@@ -12,6 +13,7 @@
 #include "time.h"
 #include "buzzer.h"
 #include "actuator.h"
+#include "encoder.h"
 
 #include <avr/io.h>
 
@@ -33,17 +35,14 @@ int main() {
 
   printf(">>>STARTUP<<<\n");
 
-  leds_set(LEDS_1);
+  pos_t pos;
 
-  power_esc_on();
-
-  receiver_passthrough_set();
   while (1) {
-    printf("vals: %X; %u %u %u\n",
-        PINC,
-        power_read_index(0),
-        power_read_index(1),
-        power_read_index(2));
+    encoder_get_pos(&pos);
+    encoder_update();
+
+    printf("pos x:%u y:%u t:%u\n", pos.x, pos.y, pos.theta);
+
     _delay_ms(1000);
   }
 
@@ -58,19 +57,9 @@ void hardware_init(void) {
   buzzer_init();
   power_init(POWER_ADAPTIVE);
   actuator_init();
+  encoder_init();
 }
 
-// // setup peripherals
-// void setup() {
-//   power_init();
-//   serial_init(SERIAL_BAUD);
-//   leds_init();
-//   receiver_init();
-//   buzzer_init();
-//   sonar_init();
-//   actuator_init();
-// }
-// 
 // void loop() {
 //   // disarmed state - brake applied and 1 layer of protection before automatic
 //   // driving starts. To move to next stage pull trigger for 2 seconds then
