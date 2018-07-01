@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import time
 
+PIXEL_TO_UNITY = 1.0/7.0
 
 def threshold_image(img):
 	redChan = img[:,:,0]
@@ -35,50 +36,99 @@ def perspecitve_warp(image, inverse=False):
 	return newImage
 
 def show_image(image):
-	cv2.namedWindow('Image1', cv2.WINDOW_NORMAL)
-	cv2.imshow('Image1', image)
+	cv2.namedWindow('Image2', cv2.WINDOW_NORMAL)
+	cv2.imshow('Image2', image)
 	cv2.waitKey(0)
 
 
-def find_path(img, trackWidth = None):
+def fit_circle_2d(x, y, w=[]):
+    
+    A = np.array([x, y, np.ones(len(x))]).T
+    b = x**2 + y**2
+    
+    # Modify A,b for weighted least squares
+    if len(w) == len(x):
+        W = np.diag(w)
+        A = np.dot(W,A)
+        b = np.dot(W,b)
+    
+    # Solve by method of least squares
+    c = np.linalg.lstsq(A,b)[0]
+    
+    # Get circle parameters from solution c
+    xc = c[0]/2
+    yc = c[1]/2
+    r = np.sqrt(c[2] + xc**2 + yc**2)
+    return xc, yc, r
+
+def threshold_obstacles(img):
+	redChan = img[:,:,0]
+	blueChan = img[:,:,1]
+	greenChan = img[:,:,2]
+	#passed by reference so should auto update img
+	redExpected = 117 #expected purple colour for obstacles
+	blueExpected = 44
+	greenExpected = 69
+	redThresh = 30
+	blueThresh = 30
+	greenThresh = 30
+	mask = np.logical_or(np.logical_or(np.logical_or(redChan < redExpected - redThresh, redChan > redExpected + redThresh), 
+										np.logical_or(blueChan < blueExpected - blueThresh, blueChan > blueExpected + blueThresh)), 
+										np.logical_or(greenChan < greenExpected - greenThresh, greenChan > greenExpected + greenThresh))
+	redChan[mask] = 0
+	blueChan[mask] = 0
+	greenChan[mask] = 0 
+	img /= 255.0
+
+STEERING_ANGLE_SHRINK_RATE = 0.2
+def find_path(img, trackWidth = None, steeringAngle = 0):
 	
 	#warp the image to top down
 	img1 = perspecitve_warp(img)
-	img1 = img1.astype('float32')
+	h, w, d = img1.shape
 
+	M = cv2.getRotationMatrix2D((w/2,h),STEERING_ANGLE_SHRINK_RATE*steeringAngle, 1)
+	img1 = cv2.warpAffine(img1,M,dsize = (w,h))
+	img1 = img1.astype('float32')
+	obstacleImage = img1.copy()
+	# print obstacleImage[150,250,:]
+	# exit()
+	threshold_obstacles(obstacleImage)
+	obstacleImageGray = np.sum(obstacleImage, axis = 2)/3.0
 	#get seperate images for the two lines
 	threshold_image(img1)
 	blueLineImage = img1[:,:,0]
 	yellowLineImage = img1[:,:,1]
-
 	
-
-	h, w, d = img1.shape
+	
 	
 	# NOTE: THIS SECTION IS BY FAR THE SLOWEST PART
 	
 	#construct grid of indexes from 0 to h with width w
-	
 	blueIndexGrid = np.transpose(np.mgrid[0:w,0:h][0]).astype('float32') # takes approx 2ms
-	
 	# where the image has colour, leave the index, otherwise set it to nan
-	
 	blueIndexGrid[blueLineImage == 0] = np.nan # takes approx 0.4 ms
-	
-	yellowIndexGrid = np.transpose(np.mgrid[0:w,0:h][0]).astype('float32')
-	yellowIndexGrid[yellowLineImage == 0] = np.nan
 	# Take the median of all values with colour
 	# This should be the center of the line for that row
 	blueMedians = np.nanmedian(blueIndexGrid, axis = 1) # takes approx 5 ms
+
+	yellowIndexGrid = np.transpose(np.mgrid[0:w,0:h][0]).astype('float32')
+	yellowIndexGrid[yellowLineImage == 0] = np.nan
 	yellowMedians = np.nanmedian(yellowIndexGrid, axis = 1)
-	
+
+	obstacleIndexGrid = np.transpose(np.mgrid[0:w,0:h][0]).astype('float32')
+	obstacleIndexGrid[obstacleImageGray == 0] = 0
+	rightObstacleSides = np.nanmax(obstacleIndexGrid, axis = 1)
+	obstacleIndexGrid[obstacleImageGray == 0] = np.nan
+	leftObstacleSides = np.nanmin(obstacleIndexGrid, axis = 1)
+
 	# SLOW SECTION ENDS HERE
 
 	points = []
 	#probably a numpy way to avoid this for loop
 	for i in range(0, img1.shape[0]): # for each row in the image
 		#reverse the index so iterating bottom to top of image
-		i = img1.shape[0] - i - 1
+		# i = img1.shape[0] - i - 1
 		
 		blueValue = blueMedians[i]
 		yellowValue = yellowMedians[i]
@@ -86,6 +136,39 @@ def find_path(img, trackWidth = None):
 			blueValue = None
 		if np.isnan(yellowValue):
 			yellowValue = None
+
+		rightObstacleValue = rightObstacleSides[i]
+		leftObstacleValue = leftObstacleSides[i]
+
+		obstacleClearance = 20
+		MIN_PATH_WIDTH = 50
+		if rightObstacleValue != 0:
+			#there is an obstacle on this section of track
+			if blueValue is None and yellowValue is None:
+				print "Both were none but obstacle detected"
+				#do something here
+			else:
+				if blueValue is None:
+					#the obstacle is covering the blue line
+					blueValue = rightObstacleValue + obstacleClearance
+					if (yellowValue - blueValue) < MIN_PATH_WIDTH:
+						yellowValue = leftObstacleValue - obstacleClearance
+						blueValue = None
+					pass
+				elif yellowValue is None:
+					#the obstacle is covering the yellow line
+					yellowValue = leftObstacleValue - obstacleClearance
+					
+					if (yellowValue - blueValue) < MIN_PATH_WIDTH:
+						blueValue = rightObstacleValue + obstacleClearance
+						yellowValue = None
+					
+				elif (yellowValue - rightObstacleValue) > (leftObstacleValue - blueValue):
+					#there is more room to the right of the obstacle
+					blueValue = rightObstacleValue + obstacleClearance
+				else:
+					#more room to left
+					yellowValue = leftObstacleValue - obstacleClearance
 
 
 		if blueValue is not None and yellowValue is not None:
@@ -125,23 +208,30 @@ def find_path(img, trackWidth = None):
 	#we know the circle goes through the origin and the center is on the
 	#x axis
 	points = np.array(points)
-	numeratorSum = np.sum(np.power(points[:,0], 3) + np.power(points[:,1],2) * points[:,0])
-	denominatorSum = np.sum(np.power(points[:,0],2))
+	# numeratorSum = np.sum(np.power(points[:,0], 3) + np.power(points[:,1],2) * points[:,0])
+	# denominatorSum = np.sum(np.power(points[:,0],2))
 
+	numerator = np.power(points[:,0], 2) + np.power(points[:,1],2)
+	numeratorSum = np.sum(numerator)
+	denominatorSum = np.sum(points[:,0])
 	radius = 0.5 * numeratorSum/denominatorSum
 
-	print "Radius: ", radius
-
+	# xc, yc, r = fit_circle_2d(points[:,0], points[:,1])
+	# cv2.circle(img1, (int(w/2 + xc), h - int(yc)), int(abs(r)),(0,255,0))
+	if abs(radius) < 100:
+		radius = 10000
 	#draw on the circular path
+	img1 += obstacleImage
 	cv2.circle(img1, (int(w/2 + radius), h), int(abs(radius)),(0,0,255)) 
-	return radius, img1
+
+	return radius * PIXEL_TO_UNITY, img1
 
 if __name__=="__main__":
-	for imageCounter in range(3, 400):
+
+	for imageCounter in range(3, 4):
 		im1Path = 'C:/Projects/self-driving-model-car/QUTDroidRacing/PythonTesting/unityTestImages2/img_%04d.jpg' % (imageCounter)
 		scale = 1.0
 
-		
 		img1 = cv2.imread(im1Path, cv2.IMREAD_COLOR)
 		start = time.clock()
 		radius, image = find_path(img1)
@@ -149,5 +239,5 @@ if __name__=="__main__":
 		# image = perspecitve_warp(image, True)
 		cv2.namedWindow('Image1', cv2.WINDOW_NORMAL)
 		cv2.imshow('Image1', image)
-		cv2.waitKey(1)
+		cv2.waitKey(0)
 		
