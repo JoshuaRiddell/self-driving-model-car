@@ -52,6 +52,10 @@ void setup() {
 void loop() {
   actuator_idle();
 
+  _delay_ms(300);
+
+  digitalWrite(ESC_PIN, LOW);
+
   // disarmed state - brake applied and 1 layer of protection before automatic
   // driving starts. To move to next stage pull trigger for 2 seconds then
   // release.
@@ -90,8 +94,6 @@ void loop() {
       actuator_write_index(incomingBuffer[0], incomingBuffer[1]);
     }
   }
-
-  digitalWrite(ESC_PIN, LOW);
 }
 
 // sequence for initial arming. Waits for the trigger to be pulled
