@@ -81,10 +81,13 @@ def threshold_obstacles(img):
 	img /= 255.0
 
 STEERING_ANGLE_SHRINK_RATE = 0.2
-def find_path(img, trackWidth = None, steeringAngle = 0):
+def find_path(img, trackWidth = None, steeringAngle = 0, warped=False):
 	
 	#warp the image to top down
-	img1 = perspecitve_warp(img)
+	if not warped:
+		img1 = perspecitve_warp(img)
+	else:
+		img1 = img
 	h, w, d = img1.shape
 
 	M = cv2.getRotationMatrix2D((w/2,h),STEERING_ANGLE_SHRINK_RATE*steeringAngle, 1)
@@ -99,6 +102,9 @@ def find_path(img, trackWidth = None, steeringAngle = 0):
 	threshold_image(img1)
 	blueLineImage = img1[:,:,0]
 	yellowLineImage = img1[:,:,1]
+
+	cv2.imshow('frame', blueLineImage)
+	cv2.waitKey(1)
 	
 	
 	
@@ -226,7 +232,7 @@ def find_path(img, trackWidth = None, steeringAngle = 0):
 
 	return radius * PIXEL_TO_UNITY, img1
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
 	for imageCounter in range(3, 4):
 		im1Path = 'C:/Projects/self-driving-model-car/QUTDroidRacing/PythonTesting/unityTestImages2/img_%04d.jpg' % (imageCounter)
