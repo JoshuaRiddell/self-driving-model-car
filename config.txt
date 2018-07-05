@@ -1,5 +1,5 @@
 # car addresses
-CAR_ADDRESS="10.0.0.149"
+CAR_ADDRESS="10.1.0.1"
 CAR_USR="ubuntu"
 
 # car directories of interest

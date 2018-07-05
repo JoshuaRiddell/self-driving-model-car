@@ -12,4 +12,6 @@ function echo {
 
 echo "Uploading to arduino..."
 
+killall screen
+
 arduino --upload --board arduino:avr:uno --port $CAR_ARDUINO_PORT $CAR_PROJECT_DIR/car/hardware/hardware.ino

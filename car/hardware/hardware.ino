@@ -5,7 +5,6 @@
 #include "state_lights.h"
 #include "receiver.h"
 #include "buzzer.h"
-#include "power.h"
 
 // TODO
 // add proper tones
@@ -23,10 +22,12 @@ void manual_control(void);
 // setup peripherals
 void setup() {
   // initialise power control
-  power_init();
+  // power_init();
+
+  pinMode(ESC_PIN, OUTPUT);
 
   // status light pins
-  state_lights_init();
+  // state_lights_init();
 
   // rc receiver pwm input
   receiver_init();
@@ -49,6 +50,8 @@ void setup() {
 }
 
 void loop() {
+  actuator_idle();
+
   // disarmed state - brake applied and 1 layer of protection before automatic
   // driving starts. To move to next stage pull trigger for 2 seconds then
   // release.
@@ -56,6 +59,8 @@ void loop() {
   wait_for_arm();
 
   // armed state - a single pull of the trigger will start the car
+  digitalWrite(ESC_PIN, HIGH);
+
   Serial.write(SERIAL_ARMED);
   wait_for_start();
 
@@ -85,14 +90,16 @@ void loop() {
       actuator_write_index(incomingBuffer[0], incomingBuffer[1]);
     }
   }
+
+  digitalWrite(ESC_PIN, LOW);
 }
 
 // sequence for initial arming. Waits for the trigger to be pulled
 // for 2 seconds then to be released before it progresses
 void wait_for_arm() {
   // set white light
-  state_lights_clear_all();
-  state_lights_set(WHITE);
+  // state_lights_clear_all();
+  // state_lights_set(WHITE);
 
   // wait for the trigger to be pressed for more than 2 seconds
   uint8_t timer_counter = 0;
@@ -102,7 +109,7 @@ void wait_for_arm() {
       timer_counter += 1;
       if (timer_counter == 1) {
         // if trigger was only just pulled then set a light and play sound
-        state_lights_set(BLUE);
+        // state_lights_set(BLUE);
         buzzer_play_sound(SOUND_LOW);
       } else if (timer_counter > ARM_CUTOFF / 50) {
         // if we exceeded time about then continue
@@ -110,14 +117,14 @@ void wait_for_arm() {
       }
     } else {
       // if trigger was released then reset counter and clear blue light
-      state_lights_clear(BLUE);
+      // state_lights_clear(BLUE);
       timer_counter = 0;
     }
     delay(50);
   }
 
   // set red armed light and play a sound
-  state_lights_set(RED);
+  // state_lights_set(RED);
   buzzer_play_sound(SOUND_HIGH);
   delay(100);
   buzzer_play_sound(SOUND_HIGH);
@@ -129,9 +136,9 @@ void wait_for_arm() {
 
   // play a and set leds to armed mode state
   buzzer_play_sound(SOUND_LOW);
-  state_lights_set(GREEN);
-  state_lights_clear(BLUE);
-  state_lights_clear(RED);
+  // state_lights_set(GREEN);
+  // state_lights_clear(BLUE);
+  // state_lights_clear(RED);
   // currently lit: white + green
   delay(100);
 }
@@ -139,9 +146,9 @@ void wait_for_arm() {
 // sequence for starting. Waits for the remote trigger to be pressed.
 void wait_for_start() {
   // set lights to armed state
-  state_lights_clear_all();
-  state_lights_set(WHITE);
-  state_lights_set(GREEN);
+  // state_lights_clear_all();
+  // state_lights_set(WHITE);
+  // state_lights_set(GREEN);
 
   // wait for trigger to be pressed
   while (receiver_get_pwm(THROT_ID) < STARTUP_THRESH) {
@@ -150,7 +157,7 @@ void wait_for_start() {
 
   // play a sound and set to auto mode lights
   buzzer_play_sound(SOUND_HIGH);
-  state_lights_clear(WHITE);
+  // state_lights_clear(WHITE);
   // currently lit: green
 }
 
@@ -160,9 +167,9 @@ void manual_control() {
   actuator_idle();
 
   // set lights to manual control
-  state_lights_clear_all();
-  state_lights_set(BLUE);
-  state_lights_set(GREEN);
+  // state_lights_clear_all();
+  // state_lights_set(BLUE);
+  // state_lights_set(GREEN);
   buzzer_play_sound(SOUND_HIGH);
 
   // delay to allow user to remove finger from brake to prevent a reverse

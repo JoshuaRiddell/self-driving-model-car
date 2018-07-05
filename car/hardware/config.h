@@ -6,34 +6,20 @@
 // debug message switches
 #define POWER_DEBUG_MSG
 
-
-
-
 // debug switch
 #define ENABLE_DEBUG  // enables debug messages
 #define ENABLE_SERIAL  // enables serial communications (in deployment this will be enabled)
 // #define ENABLE_SONAR  // enables sonar ranging
 // #define BUZZER_DISABLE // disables the buzzer for quiet mode
 
-// voltage sense pins
-#define SENSE_WALL 15
-#define SENSE_CPU_BATT 16
-#define SENSE_TRACT_BATT 17
-
-// power control pins
-#define CTL_ESC 13
-#define CTL_WALL 18
-#define CTL_CPU_BATT 19
-
-#define CTL_WALL_INTERRUPT PCINT9
-#define CTL_WALL_INTERRUPT_ENABLE PCIE1
-
 // serial paramters
 #define SERIAL_BAUD 115200
 #define BUFFER_SIZE 2
 
+#define ESC_PIN 13
+
 // buzzer parameters
-#define BUZZER_PIN 14
+#define BUZZER_PIN 6
 #define BUZZ_DURATION 10000
 #define SOUND_HIGH 100
 #define SOUND_MIDDLE 110
@@ -46,7 +32,7 @@
 
 // output pins
 #define SERVO_TX 10
-#define THROT_TX 11
+#define THROT_TX 9
 
 // idle values for outputs
 #define SERVO_IDLE 1364
