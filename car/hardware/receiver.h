@@ -1,15 +1,13 @@
 #ifndef RECEIVER_
 #define RECEIVER_
 
-#include <stdbool.h>
-
 #include "config.h"
 
-void receiver_init(void);
-uint16_t receiver_get_pwm(uint8_t index);
-void receiver_passthrough(bool pass);
+// input pin numbers
+#define SERVO_RX 2
+#define THROT_RX 3
 
-#define receiver_passthrough_set() receiver_passthrough(true)
-#define receiver_passthrough_clear() receiver_passthrough(false)
+void receiver_init(void);
+void receiver_receiver_get_pwm(uint8_t index);
 
 #endif  // RECEIVER_

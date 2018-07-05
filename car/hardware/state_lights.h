@@ -1,5 +1,5 @@
-#ifndef LEDS_
-#define LEDS_
+#ifndef STATE_LIGHTS_
+#define STATE_LIGHTS_
 
 // COMBINATIONS
 // white only: car is disarmed and waiting for arming by pulling the trigger back
@@ -9,15 +9,13 @@
 // green only: car is armed and in autonomous mode, reading from serial input
 // green + blue: car is armed and in manual mode, reading from the radio receiver
 
-void leds_init();
-void leds_strum();
-void leds_set(uint8_t pin);
-void leds_clear(uint8_t pin);
-void leds_clear_all();
-void leds_toggle(uint8_t pin);
 
-#define LEDS_1 0
-#define LEDS_2 1
+void state_lights_init();
+void state_lights_strum();
+void state_lights_set(int pin);
+void state_lights_clear(int pin);
+void state_lights_clear_all();
+void state_lights_toggle(int pin);
 
-#endif  // LEDS_
+#endif  // STATE_LIGHTS_
 

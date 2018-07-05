@@ -1,5 +1,5 @@
 # car addresses
-CAR_ADDRESS="10.0.0.149"
+CAR_ADDRESS="10.1.0.1"
 CAR_USR="ubuntu"
 
 # car directories of interest
@@ -8,13 +8,11 @@ CAR_TEST_IMAGES_DIR="/home/ubuntu/test_images"
 
 # car arduino directories
 CAR_ARDUINO_PORT="/dev/ttyACM0"
-CAR_ARDUINO_BAUD="115200"
+CAR_ARDUINO_BAUD="9600"
 
 # base station directories
 BASE_PROJECT_DIR="/home/josh/self-driving-model-car"
 BASE_TEST_IMAGES_DIR="/home/josh/test_images"
-
-
 
 
 
