@@ -50,35 +50,37 @@ static uint8_t cpu_power_state = WALL_INDEX;
 inline static void power_set_cpu(uint8_t index);
 
 void power_init(uint8_t mode) {
-    cli();
+    // cli();
 
     CPU_BATT_INIT();
     WALL_INIT();
     ESC_INIT();
 
-    CPU_BATT_ON();
+    power_set_cpu_mode(CPU_BATT_INDEX);
 
-    power_mode = mode;
+    // CPU_BATT_ON();
 
-    update_wall_power();
+    // power_mode = mode;
 
-    adc_init();
+    // update_wall_power();
 
-    sei();
+    // adc_init();
+
+    // sei();
 }
 
-static void adc_init() {
-    SENSE_DDR &= ~(_BV(SENSE_WALL_PIN)|
-                    _BV(SENSE_CPU_BATT_PIN)|
-                    _BV(SENSE_TRACT_BATT_PIN));
+// static void adc_init() {
+//     SENSE_DDR &= ~(_BV(SENSE_WALL_PIN)|
+//                     _BV(SENSE_CPU_BATT_PIN)|
+//                     _BV(SENSE_TRACT_BATT_PIN));
 
-    ADCSRA = _BV(ADEN)|_BV(ADIE)|_BV(ADPS0)|_BV(ADPS1)|_BV(ADPS2);
+//     ADCSRA = _BV(ADEN)|_BV(ADIE)|_BV(ADPS0)|_BV(ADPS1)|_BV(ADPS2);
 
-    read_index = 0;
+//     read_index = 0;
 
-    ADMUX = ADMUX_BASE|mux_vals[read_index];
-    ADCSRA |= _BV(ADSC);
-}
+//     ADMUX = ADMUX_BASE|mux_vals[read_index];
+//     ADCSRA |= _BV(ADSC);
+// }
 
 void power_esc_set(bool val) {
     if (val) {
@@ -142,17 +144,17 @@ inline static void power_set_cpu(uint8_t index) {
     }
 }
 
-ISR(ADC_vect) {
-    adc_readings[read_index] = ADC;
+// ISR(ADC_vect) {
+//     adc_readings[read_index] = ADC;
 
-    if (read_index == 0) {
-        update_wall_power();
-    }
+//     if (read_index == 0) {
+//         update_wall_power();
+//     }
 
-    ++read_index;
-    read_index %= 3;
+//     ++read_index;
+//     read_index %= 3;
 
-    ADMUX = ADMUX_BASE|mux_vals[read_index];
-    ADCSRA |= _BV(ADSC);
-}
+//     ADMUX = ADMUX_BASE|mux_vals[read_index];
+//     ADCSRA |= _BV(ADSC);
+// }
 

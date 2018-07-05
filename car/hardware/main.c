@@ -7,15 +7,22 @@
 // #include "ranging.h"
 #include "leds.h"
 #include "receiver.h"
-#include "power.h"
 #include "serial.h"
 #include "config.h"
 #include "time.h"
 #include "buzzer.h"
 #include "actuator.h"
-#include "encoder.h"
 
 #include <avr/io.h>
+
+
+#define ESC_INIT() CTL_ESC_DDR |= _BV(CTL_ESC_PIN); ESC_OFF()
+#define ESC_ON() CTL_ESC_PORT |= _BV(CTL_ESC_PIN)
+#define ESC_OFF() CTL_ESC_PORT &= ~_BV(CTL_ESC_PIN)
+
+#define CPU_BATT_INIT() CTL_CPU_BATT_DDR |= _BV(CTL_CPU_BATT_PIN); CPU_BATT_OFF()
+#define CPU_BATT_ON() CTL_CPU_BATT_PORT |= _BV(CTL_CPU_BATT_PIN)
+#define CPU_BATT_OFF() CTL_CPU_BATT_PORT &= ~_BV(CTL_CPU_BATT_PIN)
 
 
 // TODO
@@ -35,15 +42,30 @@ int main() {
 
   printf(">>>STARTUP<<<\n");
 
-  pos_t pos;
+  receiver_passthrough_set();
+  ESC_ON();
+
+  char inbuff[50];
+  uint8_t i = 0;
+  char c = ' ';
 
   while (1) {
-    encoder_get_pos(&pos);
-    encoder_update();
+    // do {
+    //   if (serial_available()) {
+    //     c = serial_get_char(NULL);
+    //     inbuff[i++] = c;
+        
+    //     leds_set(LEDS_2);
 
-    printf("pos x:%u y:%u t:%u\n", pos.x, pos.y, pos.theta);
+    //     if (c == '\n') leds_set(LEDS_1);
 
-    _delay_ms(1000);
+    //   }
+    // } while (c != '\n');
+
+    // inbuff[i] = 0;
+    // printf("%s", inbuff);
+
+    i = 0;
   }
 
   return 0;
@@ -55,9 +77,11 @@ void hardware_init(void) {
   leds_init();
   receiver_init();
   buzzer_init();
-  power_init(POWER_ADAPTIVE);
   actuator_init();
-  encoder_init();
+
+  ESC_INIT();
+  CPU_BATT_INIT();
+  CPU_BATT_ON();
 }
 
 // void loop() {

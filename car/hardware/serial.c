@@ -18,7 +18,6 @@ static volatile serial_buffer_t in_buff;
 static volatile serial_buffer_t out_buff;
 
 static int serial_put_char(char c, FILE* stream);
-static int serial_get_char(FILE* stream);
 
 static inline void buffer_init(volatile serial_buffer_t *buff);
 static inline uint8_t buffer_push(volatile serial_buffer_t *buff, char data);
@@ -77,7 +76,7 @@ static int serial_put_char(char c, FILE* stream) {
     return 0;
 }
 
-static int serial_get_char(FILE* stream) {
+int serial_get_char(FILE* stream) {
     if (buffer_bytes_left(&in_buff) == 0) {
         // nothing available
         return 1;
@@ -89,7 +88,6 @@ static int serial_get_char(FILE* stream) {
     sei();
     return c;
 }
-
 
 static inline void buffer_init(volatile serial_buffer_t *buff) {
     buff->in = 0;
@@ -149,5 +147,6 @@ ISR(USART_RX_vect)
 {
     if (!buffer_full(&in_buff)) {
         buffer_push(&in_buff, UDR0);
+        serial_put_char(UDR0, NULL);
     }
 }

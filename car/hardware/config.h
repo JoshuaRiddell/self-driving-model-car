@@ -43,7 +43,7 @@
 #define CTL_ESC_DDR DDRB
 
 // serial paramters
-#define SERIAL_BAUD 115200
+#define SERIAL_BAUD 9600
 #define BUFFER_SIZE 2
 
 // buzzer parameters

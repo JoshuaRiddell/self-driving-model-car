@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
 #include <math.h>
 
@@ -100,5 +101,11 @@ ISR(PCINT1_vect) {
         ++encoder_l;
     } else {
         ++encoder_r;
+    }
+
+    if (ENCODER_PIN & _BV(ENCODER_LEFT_PIN)) {
+        leds_set(LEDS_1);
+    } else {
+        leds_clear(LEDS_1);
     }
 }
