@@ -17,6 +17,10 @@ void actuator_write_index(uint8_t index, uint16_t val) {
     output_pins[index].writeMicroseconds(val);
 }
 
+void actuator_write_index_byte(uint8_t index, uint8_t val) {
+    output_pins[index].write(val);
+}
+
 // idle throttle and centre steering
 void actuator_idle(void) {
   output_pins[SERVO_ID].writeMicroseconds(SERVO_IDLE);

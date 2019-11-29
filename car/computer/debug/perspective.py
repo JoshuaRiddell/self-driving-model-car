@@ -12,7 +12,7 @@ import numpy as np
 import cv2
 
 # file to store the finished matrix in
-MATRIX_FILENAME = '../perspective_matrix.txt'
+MATRIX_FILENAME = '/home/ubuntu/rsync_car/car/computer/perspective_matrix.txt'
 
 # sub pixel corner algorithm
 STOP_CRIT = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)

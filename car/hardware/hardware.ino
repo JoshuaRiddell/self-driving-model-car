@@ -64,6 +64,7 @@ void loop() {
 
   // armed state - a single pull of the trigger will start the car
   digitalWrite(ESC_PIN, HIGH);
+  actuator_idle();
 
   Serial.write(SERIAL_ARMED);
   wait_for_start();
@@ -91,7 +92,7 @@ void loop() {
       // read two bytes of input
       Serial.readBytes(incomingBuffer, BUFFER_SIZE);
       // write command to peripheral
-      actuator_write_index(incomingBuffer[0], incomingBuffer[1]);
+      actuator_write_index_byte(incomingBuffer[0], incomingBuffer[1]);
     }
   }
 }

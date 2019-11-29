@@ -10,7 +10,7 @@ from math import pi
 if USE_SERVER:
     import server
 
-HARDWARE_CONNECTED = False
+HARDWARE_CONNECTED = True
 
 class Main(Thread):
     """Main control thread.
@@ -41,6 +41,8 @@ class Main(Thread):
                 if HARDWARE_CONNECTED:
                     self.hardware.add_to_pwm_queue(hi.SERVO, angle * 80)
                     self.hardware.add_to_pwm_queue(hi.THROT, ON)
+                    # self.hardware.add_to_pwm_queue(hi.SERVO, 47)
+
                 print "frame processed {}".format(angle)
 
 if __name__ == "__main__":

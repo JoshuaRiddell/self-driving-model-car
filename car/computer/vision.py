@@ -52,32 +52,32 @@ class VisionInterface(object):
         """Loads a perspective matrix from file to transform perspective to
         overhead view. If not available will just set the resolution.
         """
-        try:
-            if USE_PERSPECTIVE:
-                # load perspective file
-                fd = open(MATRIX_FILENAME, 'r')
+        # try:
+        if USE_PERSPECTIVE:
+            # load perspective file
+            fd = open(MATRIX_FILENAME, 'r')
 
-                coords = eval(fd.readline())
-                map_to = eval(fd.readline())
-                self.cam_res = tuple(eval(fd.readline()))
-                self.res = tuple(eval(fd.readline()))
+            coords = eval(fd.readline())
+            map_to = eval(fd.readline())
+            self.cam_res = tuple(eval(fd.readline()))
+            self.res = tuple(eval(fd.readline()))
 
-                self.M = cv.getPerspectiveTransform(
-                        np.array(coords, np.float32),
-                        np.array(map_to, np.float32))
+            self.M = cv.getPerspectiveTransform(
+                    np.array(coords, np.float32),
+                    np.array(map_to, np.float32))
 
-                fd.close()
+            fd.close()
 
-                print "Perspective loaded"
-            else:
-                raise Exception("NULL")
+            print "Perspective loaded"
+        else:
+            raise Exception("NULL")
 
-        except:
+        # except:
             # set regular resolution
-            self.cam_res = DEFAULT_RESOLUTION
-            self.res = DEFAULT_RESOLUTION
+            # self.cam_res = DEFAULT_RESOLUTION
+            # self.res = DEFAULT_RESOLUTION
 
-            print "Perspective failed to load"
+        # print "Perspective failed to load"
 
     def get_frame(self, frame_id):
         """Threadsafe function to get a frame from a given frame stream.

@@ -117,6 +117,8 @@ class HardwareInterface(Thread):
 
         # val is now a servo value, check bounds then send
         if val > PIN_BOUNDS[perp_id][0] and val < PIN_BOUNDS[perp_id][1]:
+            print "writing: {} {}".format(perp_id, val)
+
             self.ser.write(chr(int(perp_id)))
             self.ser.write(chr(int(val)))
 

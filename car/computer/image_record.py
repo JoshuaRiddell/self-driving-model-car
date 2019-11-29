@@ -26,7 +26,7 @@ class Main(Thread):
         overwrite = -1
 
         while True:
-            self.path = "/home/ubuntu/car/computer/images/" + path + str(path_id)
+            self.path = "/home/ubuntu/images2018/" + path + str(path_id)
             try:
                 mkdir(self.path)
                 break

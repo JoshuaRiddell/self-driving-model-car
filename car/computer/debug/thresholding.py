@@ -12,7 +12,7 @@ user = getpass.getuser()
 #    [[0, 0], [100, 100]], # blue crop
 #]
 
-THRESH_FILENAME = "/home/" + user + "/car/computer/debug/thresholds.txt"
+THRESH_FILENAME = "/home/" + user + "/rsync_car/car/computer/debug/thresholds.txt"
 if user == 'BBL':
     THRESH_FILENAME = "/Users/BBL/Projects/self-driving-model-car/car/computer/debug/thresholds.txt"
 # bounds of colours (hsv) values (left track, right track, obstacle)
