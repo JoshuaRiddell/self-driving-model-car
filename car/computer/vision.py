@@ -132,8 +132,8 @@ class VisionInterface(object):
         threshs = thr.apply_morph(threshs)
 
         self.update_frame(1, threshs[0])
-        cv.imshow('frame', threshs[2])
-        cv.waitKey(1)
+        # cv.imshow('frame', threshs[2])
+        # cv.waitKey(1)
         matrices = thr.downsample(threshs)
 
         
